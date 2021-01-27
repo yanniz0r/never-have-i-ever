@@ -1,0 +1,15 @@
+{
+  "name": "@nhie/api",
+  "man": [
+    "dist/index.js"
+  ],
+  "files": [
+    "dist/**/*"
+  ],
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.1.3"
+  }
+}
