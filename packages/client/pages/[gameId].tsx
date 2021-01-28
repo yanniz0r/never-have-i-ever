@@ -1,9 +1,10 @@
 import Head from 'next/head'
 import socketio from 'socket.io-client'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import * as API from '@nhie/api/dist/index';
 import { MdThumbUp, MdThumbDown } from 'react-icons/md'
 import AnswerLabel from '../components/answer-label';
+import { useRouter } from 'next/router';
 
 const twColsClassForPlayerAmount = (player: number) => {
   if (player === 1) {
@@ -18,6 +19,7 @@ const twColsClassForPlayerAmount = (player: number) => {
 }
 
 export default function Home() {
+  const router = useRouter();
   const [players, setPlayers] = useState<API.IPlayer[]>([]);
   const [myId, setMyId] = useState<string>()
   const [username, setUsername] = useState<string>("");
@@ -40,6 +42,14 @@ export default function Home() {
     })
     return io
   }, []);
+
+  useEffect(() => {
+    if (!io || !router.query.gameId) return;
+    const enter: API.EnterGameEvent = {
+      game: String(router.query.gameId)
+    }
+    io.emit(API.Events.Enter, enter, console.log)
+  }, [io, router.query.gameId])
 
   const login = useCallback(() => {
     const joinEvent: API.JoinEvent = {
@@ -80,7 +90,6 @@ export default function Home() {
           </div>
         </div>
       }
-
       <main className="grid grid-cols-2 h-full" style={{ filter: myId ? 'none' : 'blur(2px)' }}>
         <div className="text-white bg-gray-900 p-10 flex items-center justify-center">
           <div className={`grid gap-16 ${twColsClassForPlayerAmount(players.length)}`}>

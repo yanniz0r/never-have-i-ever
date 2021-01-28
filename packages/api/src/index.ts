@@ -1,5 +1,6 @@
 export enum Events {
   Join = 'join',
+  Enter = 'enter',
   PlayerJoined = 'player-joined',
   ShowQuestion = 'show-question',
   Answer = 'answer',
@@ -17,6 +18,12 @@ export interface PlayerAnsweredEvent {
 export interface ShowQuestionEvent {
   question: IQuestion;
 }
+
+export interface EnterGameEvent {
+  game: string;
+}
+
+export type EnterGameAck = (success: boolean) => void
 
 export interface IPlayer {
   name: string;

@@ -4,6 +4,7 @@ exports.Events = void 0;
 var Events;
 (function (Events) {
     Events["Join"] = "join";
+    Events["Enter"] = "enter";
     Events["PlayerJoined"] = "player-joined";
     Events["ShowQuestion"] = "show-question";
     Events["Answer"] = "answer";

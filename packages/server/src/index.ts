@@ -38,7 +38,7 @@ class Game {
   public currentQuestion!: Question
   private answers: Map<Player, boolean> = new Map();
 
-  constructor() {
+  constructor(public id: string) {
     this.pickQuestion();
   }
 
@@ -74,16 +74,30 @@ class Game {
   }
 }
 
-const game = new Game()
+const games: Record<string, Game> = {
+  "1": new Game("1"),
+  "2": new Game("2")
+}
 
 io.on('connection', (socket: Socket) => {
-  // console.log(socket.rooms);
-  const showQuestionEvent: API.ShowQuestionEvent = {
-    question: game.currentQuestion
-  }
-  socket.emit(API.Events.ShowQuestion, showQuestionEvent)
 
   let player: Player;
+  let game: Game;
+
+  socket.on(API.Events.Enter, (event: API.EnterGameEvent, ack?: API.EnterGameAck) => {
+    const existingGame = games[event.game];
+    if (existingGame) {
+      game = existingGame;
+      socket.join(existingGame.id);
+      const showQuestionEvent: API.ShowQuestionEvent = {
+        question: game.currentQuestion
+      }
+      socket.emit(API.Events.ShowQuestion, showQuestionEvent);
+      ack?.(true);
+    } else {
+      ack?.(false);
+    }
+  })
 
   socket.on(API.Events.Join, (event: API.JoinEvent, ack: API.JoinAck) => {
     player = new Player(event.name);
@@ -91,7 +105,7 @@ io.on('connection', (socket: Socket) => {
     const playerJoinedEvent: API.PlayerJoinedEvent = {
       players: game.players
     }
-    io.emit(API.Events.PlayerJoined, playerJoinedEvent)
+    io.to(game.id).emit(API.Events.PlayerJoined, playerJoinedEvent)
     ack(player.id)
   })
 
@@ -105,12 +119,12 @@ io.on('connection', (socket: Socket) => {
       const showQuestionEvent: API.ShowQuestionEvent = {
         question: game.pickQuestion()
       }
-      io.emit(API.Events.ShowQuestion, showQuestionEvent)
+      io.to(game.id).emit(API.Events.ShowQuestion, showQuestionEvent)
     }
     const playerAnsweredEvent: API.PlayerAnsweredEvent = {
       playerAnswers: game.allAnswers()
     }
-    io.emit(API.Events.PlayerAnswered, playerAnsweredEvent);
+    io.to(game.id).emit(API.Events.PlayerAnswered, playerAnsweredEvent);
   })
 })
 
