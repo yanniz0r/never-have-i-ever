@@ -6,6 +6,6 @@ var Events;
     Events["SetUserData"] = "set-user-data";
     Events["PlayerJoined"] = "player-joined";
     Events["ShowQuestion"] = "show-question";
-    Events["Drink"] = "drink";
-    Events["Skip"] = "skip";
+    Events["Answer"] = "answer";
+    Events["PlayerAnswered"] = "player-answered";
 })(Events = exports.Events || (exports.Events = {}));
