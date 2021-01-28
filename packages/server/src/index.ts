@@ -85,13 +85,14 @@ io.on('connection', (socket: Socket) => {
 
   let player: Player;
 
-  socket.on(API.Events.SetUserData, (event:API.SetUserDataEvent) => {
+  socket.on(API.Events.Join, (event: API.JoinEvent, ack: API.JoinAck) => {
     player = new Player(event.name);
     game.players.push(player);
     const playerJoinedEvent: API.PlayerJoinedEvent = {
       players: game.players
     }
     io.emit(API.Events.PlayerJoined, playerJoinedEvent)
+    ack(player.id)
   })
 
   socket.on(API.Events.Answer, (event: API.AnswerEvent) => {

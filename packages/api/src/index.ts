@@ -1,5 +1,5 @@
 export enum Events {
-  SetUserData = 'set-user-data',
+  Join = 'join',
   PlayerJoined = 'player-joined',
   ShowQuestion = 'show-question',
   Answer = 'answer',
@@ -15,7 +15,7 @@ export interface PlayerAnsweredEvent {
 }
 
 export interface ShowQuestionEvent {
-  question: string;
+  question: IQuestion;
 }
 
 export interface IPlayer {
@@ -23,9 +23,11 @@ export interface IPlayer {
   id: string;
 }
 
-export interface SetUserDataEvent {
+export interface JoinEvent {
   name: string;
 }
+
+export type JoinAck = (id: string) => void
 
 export interface AnswerEvent {
   answer: boolean;

@@ -19,9 +19,9 @@ const twColsClassForPlayerAmount = (player: number) => {
 
 export default function Home() {
   const [players, setPlayers] = useState<API.IPlayer[]>([]);
+  const [myId, setMyId] = useState<string>()
   const [username, setUsername] = useState<string>("");
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
-  const [loggedIn, setLoggedIn] = useState(false);
   const [question, setQuestion] = useState<API.IQuestion>();
 
   const io = useMemo(() => {
@@ -42,11 +42,10 @@ export default function Home() {
   }, []);
 
   const login = useCallback(() => {
-    const setUserDataEvent: API.SetUserDataEvent = {
+    const joinEvent: API.JoinEvent = {
       name: username
     }
-    io.emit(API.Events.SetUserData, setUserDataEvent);
-    setLoggedIn(true)
+    io.emit(API.Events.Join, joinEvent, setMyId);
   }, [username])
 
   const yay = useCallback(() => {
@@ -69,7 +68,7 @@ export default function Home() {
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {!loggedIn && 
+      {!myId && 
         <div className="absolute flex flex-col w-full h-full justify-center items-center z-10">
           <div className="bg-white p-10">
             <h2 className="text-xl font-bold">Dem Spiel beitreten</h2>
@@ -82,12 +81,12 @@ export default function Home() {
         </div>
       }
 
-      <main className="grid grid-cols-2 h-full" style={{ filter: loggedIn ? 'none' : 'blur(2px)' }}>
+      <main className="grid grid-cols-2 h-full" style={{ filter: myId ? 'none' : 'blur(2px)' }}>
         <div className="text-white bg-gray-900 p-10 flex items-center justify-center">
           <div className={`grid gap-16 ${twColsClassForPlayerAmount(players.length)}`}>
             {players.map((player, index) => (
-              <div key={index} className="flex justify-center items-center flex-col">
-                <div className="w-24 h-24 text-5xl flex items-center justify-center bg-gray-800 rounded-full">
+              <div key={index} className={`flex justify-center items-center flex-col transform transition ${answers[player.id] && 'scale-125'}`}>
+                <div className={`w-24 h-24 text-5xl flex items-center justify-center rounded-full ${myId === player.id ? 'bg-blue-700' : 'bg-gray-800'}`}>
                   <AnswerLabel answer={answers[player.id]}>{player.name[0]}</AnswerLabel>
                 </div>
                 <h3 className="text-2xl mt-2">{player.name}</h3>
