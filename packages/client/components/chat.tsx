@@ -1,6 +1,7 @@
 import { IPlayer } from '@nhie/api/dist'
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import * as API from '@nhie/api/dist'
+import { colorForString, twBackgroundClassForColor } from '../util/color-utils';
 
 interface ChatProps {
   io: SocketIOClient.Socket;
@@ -62,7 +63,7 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
         {messages.map((message, index) => (
           <div key={index} className="flex">
             <div className="mr-2">
-              <strong>{message.player.name}:</strong>
+              <strong className={'rounded-sm ' + twBackgroundClassForColor(colorForString(message.player.name))}>{message.player.name}</strong>
             </div>
             <div className="">
               {message.text}

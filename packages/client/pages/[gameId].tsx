@@ -6,6 +6,7 @@ import { MdThumbUp, MdThumbDown } from 'react-icons/md'
 import AnswerLabel from '../components/answer-label';
 import { useRouter } from 'next/router';
 import Chat from '../components/chat';
+import { colorForString, twBackgroundClassForColor } from '../util/color-utils';
 
 const twColsClassForPlayerAmount = (player: number) => {
   if (player === 1) {
@@ -96,11 +97,10 @@ export default function Home() {
           <div className={`grid p-10 flex-grow gap-16 ${twColsClassForPlayerAmount(players.length)}`}>
             {players.map((player, index) => (
               <div key={index} className={`flex justify-center items-center flex-col transform transition ${answers[player.id] && 'scale-125'}`}>
-                <div className={`w-24 h-24 text-5xl flex items-center justify-center rounded-full ${myId === player.id ? 'bg-blue-700' : 'bg-gray-800'}`}>
-                  <AnswerLabel answer={answers[player.id]}>{player.name[0]}</AnswerLabel>
+                <div className={`w-24 h-24 text-5xl flex items-center justify-center rounded-full ${twBackgroundClassForColor(colorForString(player.id))}`}>
+                  <AnswerLabel answer={answers[player.id]}>{player.name[0].toUpperCase()}</AnswerLabel>
                 </div>
                 <h3 className="text-2xl mt-2">{player.name}</h3>
-                <small>{player.id}</small>
               </div>
             ))}
           </div>
