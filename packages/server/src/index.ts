@@ -25,6 +25,10 @@ class Question implements API.IQuestion {
 
 }
 
+// class ChatMessage {
+//   constructor(public player: Player, public message: string){}
+// }
+
 const questions = [
   new Question('pommes vom Boden gegessen'),
   new Question('etwas geklaut'),
@@ -41,7 +45,6 @@ class Game {
   constructor(public id: string) {
     this.pickQuestion();
   }
-
 
   public answer(player: Player, answer: boolean) {
     this.answers.set(player, answer);
@@ -97,6 +100,14 @@ io.on('connection', (socket: Socket) => {
     } else {
       ack?.(false);
     }
+  })
+
+  socket.on(API.Events.SendChatMessage, (event: API.SendChatMessageEvent) => {
+    const receiveChatMessageEvent: API.ReceiveChatMessageEvent = {
+      message: event.message,
+      playerId: player.id,
+    }
+    io.to(game.id).emit(API.Events.ReceiveChatMessage, receiveChatMessageEvent);
   })
 
   socket.on(API.Events.Join, (event: API.JoinEvent, ack: API.JoinAck) => {

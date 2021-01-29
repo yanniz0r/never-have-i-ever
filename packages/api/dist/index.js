@@ -9,4 +9,6 @@ var Events;
     Events["ShowQuestion"] = "show-question";
     Events["Answer"] = "answer";
     Events["PlayerAnswered"] = "player-answered";
+    Events["SendChatMessage"] = "send-chat-message";
+    Events["ReceiveChatMessage"] = "receive-chat-message";
 })(Events = exports.Events || (exports.Events = {}));

@@ -4,11 +4,22 @@ export enum Events {
   PlayerJoined = 'player-joined',
   ShowQuestion = 'show-question',
   Answer = 'answer',
-  PlayerAnswered = 'player-answered'
+  PlayerAnswered = 'player-answered',
+  SendChatMessage = 'send-chat-message',
+  ReceiveChatMessage = 'receive-chat-message',
 }
 
 export interface IQuestion {
   text: string;
+}
+
+export interface ReceiveChatMessageEvent {
+  playerId: string;
+  message: string;
+}
+
+export interface SendChatMessageEvent {
+  message: string;
 }
 
 export interface PlayerAnsweredEvent {

@@ -5,6 +5,7 @@ import * as API from '@nhie/api/dist/index';
 import { MdThumbUp, MdThumbDown } from 'react-icons/md'
 import AnswerLabel from '../components/answer-label';
 import { useRouter } from 'next/router';
+import Chat from '../components/chat';
 
 const twColsClassForPlayerAmount = (player: number) => {
   if (player === 1) {
@@ -91,8 +92,8 @@ export default function Home() {
         </div>
       }
       <main className="grid grid-cols-2 h-full" style={{ filter: myId ? 'none' : 'blur(2px)' }}>
-        <div className="text-white bg-gray-900 p-10 flex items-center justify-center">
-          <div className={`grid gap-16 ${twColsClassForPlayerAmount(players.length)}`}>
+        <div className="text-white bg-gray-900 flex flex-col items-center justify-center">
+          <div className={`grid p-10 flex-grow gap-16 ${twColsClassForPlayerAmount(players.length)}`}>
             {players.map((player, index) => (
               <div key={index} className={`flex justify-center items-center flex-col transform transition ${answers[player.id] && 'scale-125'}`}>
                 <div className={`w-24 h-24 text-5xl flex items-center justify-center rounded-full ${myId === player.id ? 'bg-blue-700' : 'bg-gray-800'}`}>
@@ -103,6 +104,7 @@ export default function Home() {
               </div>
             ))}
           </div>
+          <Chat io={io} players={players} />
         </div>
         <div className="flex justify-center items-center flex-col bg-gradient-to-br from-blue-300 via-purple-400 to-green-300 p-10">
           <h1 className="flex flex-col text-center">
