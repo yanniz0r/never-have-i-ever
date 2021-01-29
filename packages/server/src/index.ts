@@ -3,6 +3,8 @@ import http from 'http';
 import * as API from '@nhie/api/dist/index';
 import { Server, Socket } from 'socket.io';
 import { v4 } from 'uuid'
+import Question from './models/question';
+import questions from './data/questions';
 
 const PORT = process.env.PORT || 4000;
 
@@ -19,22 +21,9 @@ class Player implements API.IPlayer {
   constructor(public name: string) {}
 }
 
-class Question implements API.IQuestion {
-
-  constructor(public text: string) {}
-
-}
-
 // class ChatMessage {
 //   constructor(public player: Player, public message: string){}
 // }
-
-const questions = [
-  new Question('pommes vom Boden gegessen'),
-  new Question('etwas geklaut'),
-  new Question('bei Twitch gestreamt'),
-  new Question('jemandem meine Lebensgeschichte erzählt und dabei festgestellt, dass ich ähnlich wie die empfangene Person bin'),
-]
 
 class Game {
   public players: Player[] = [];
