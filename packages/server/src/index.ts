@@ -91,6 +91,12 @@ io.on('connection', (socket: Socket) => {
     }
   })
 
+  socket.on('disconnect', () => {
+    if (player) {
+      game.players = game.players.filter(p => p !== player);
+    }
+  })
+
   socket.on(API.Events.SendChatMessage, (event: API.SendChatMessageEvent) => {
     const receiveChatMessageEvent: API.ReceiveChatMessageEvent = {
       message: event.message,
