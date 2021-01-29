@@ -41,4 +41,5 @@ export interface AnswerEvent {
 }
 export interface PlayerJoinedEvent {
     players: IPlayer[];
+    joinedPlayer: IPlayer;
 }

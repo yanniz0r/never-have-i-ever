@@ -103,7 +103,8 @@ io.on('connection', (socket: Socket) => {
     player = new Player(event.name);
     game.players.push(player);
     const playerJoinedEvent: API.PlayerJoinedEvent = {
-      players: game.players
+      players: game.players,
+      joinedPlayer: player,
     }
     io.to(game.id).emit(API.Events.PlayerJoined, playerJoinedEvent)
     ack(player.id)

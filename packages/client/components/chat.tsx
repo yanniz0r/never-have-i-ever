@@ -16,15 +16,7 @@ interface ChatMessage {
 const Chat: FC<ChatProps> = ({ io, players }) => {
   const [message, setMessage] = useState<string>("");
   const messageContainerRef = useRef<HTMLDivElement>();
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      player: {
-        id: "123",
-        name: "Fabian die Sau"
-      },
-      text: "Was ist das für 1 Frage hier gerade"
-    }
-  ]);
+  const [messages, setMessages] = useState<Array<ChatMessage | string>>([]);
 
   useEffect(() => {
     const receiveChatMessage = (event: API.ReceiveChatMessageEvent) => {
@@ -47,7 +39,16 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
       })
     }
     io.on(API.Events.ReceiveChatMessage, receiveChatMessage)
-    return () => io.removeEventListener(API.Events.ReceiveChatMessage, receiveChatMessage)
+    const playerJoined = (event: API.PlayerJoinedEvent) => {
+      setMessages([
+        ...messages,
+        `${event.joinedPlayer.name} ist dem Spiel beigetreten`
+      ])
+    }
+    io.on(API.Events.PlayerJoined, playerJoined)
+    return () => {
+      io.removeEventListener(API.Events.ReceiveChatMessage, receiveChatMessage)
+    }
   }, [players, messages])
 
   const sendMessage = useCallback(() => {
@@ -60,8 +61,9 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
 
   return <div className="bg-gray-800 w-full flex flex-col" style={{ height: '30vh' }}>
       <div className="p-10 flex-grow overflow-y-scroll" ref={messageContainerRef} >
-        {messages.map((message, index) => (
-          <div key={index} className="flex">
+        {messages.map((message, index) => typeof message === 'string'
+          ? <div className="text-gray-500 text-center font-italic">{message}</div>
+          : <div key={index} className="flex">
             <div className="mr-2">
               <strong className={'rounded-sm ' + twBackgroundClassForColor(colorForString(message.player.name))}>{message.player.name}</strong>
             </div>
@@ -69,7 +71,7 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
               {message.text}
             </div>
           </div>
-        ))}
+        )}
       </div>
       <div className="flex">
         <input value={message} onChange={event => setMessage(event.target.value)} placeholder="Nachricht eingeben..." className="p-2 pl-10 bg-transparent flex-grow bg-gray-700 " />
