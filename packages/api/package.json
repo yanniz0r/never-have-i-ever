@@ -5,7 +5,8 @@
     "dist/**/*"
   ],
   "scripts": {
-    "dev": "tsc -w"
+    "dev": "tsc -w",
+    "build": "tsc"
   },
   "version": "1.0.0",
   "license": "MIT",
