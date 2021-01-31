@@ -20,6 +20,11 @@ const HomePage: NextPage = () => {
   return <div className="h-screen w-screen flex flex-col bg-gradient-to-br from-blue-300 via-purple-400 to-green-300">
     <div className="p-10 sm:py-20 w-full">
       <h1 className="text-center text-5xl md:text-8xl shadows-into-light transform -skew-y-6">Never Have<br />I Ever<small>.de</small></h1>
+      {Boolean(router.query['join-game-error']) &&
+        <div className="border-2 border-red-500 p-5 rounded-lg mt-5 item-center">
+          <strong>Dem Spiel konnte nicht beigetreten werden!</strong> Bitte überprüfe die Schreibweise der URL oder erstelle eine neues Spiel.
+        </div>
+      }
     </div>
     <div className="grid grid-cols-1 md:grid-cols-3 flex-grow">
       <div className="flex flex-col items-center justify-center px-10">

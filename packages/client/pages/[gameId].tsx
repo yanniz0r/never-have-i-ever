@@ -7,6 +7,8 @@ import AnswerLabel from '../components/answer-label';
 import { useRouter } from 'next/router';
 import Chat from '../components/chat';
 import { colorForString, twBackgroundClassForColor } from '../util/color-utils';
+import { GetServerSideProps, NextPage } from 'next';
+import { fetchGame } from '../hooks/use-game'
 
 const twColsClassForPlayerAmount = (player: number) => {
   if (player === 1) {
@@ -20,13 +22,18 @@ const twColsClassForPlayerAmount = (player: number) => {
   }
 }
 
-export default function Home() {
-  const router = useRouter();
-  const [players, setPlayers] = useState<API.IPlayer[]>([]);
+interface GameProps {
+  gameId: string;
+  players: API.IPlayer[];
+  question: API.IQuestion;
+}
+
+const Game: NextPage<GameProps> = (props) => {
+  const [players, setPlayers] = useState<API.IPlayer[]>(props.players);
   const [myId, setMyId] = useState<string>()
   const [username, setUsername] = useState<string>("");
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
-  const [question, setQuestion] = useState<API.IQuestion>();
+  const [question, setQuestion] = useState<API.IQuestion>(props.question);
 
   const io = useMemo(() => {
     if (typeof window === 'undefined') {
@@ -46,12 +53,12 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!io || !router.query.gameId) return;
+    if (!io) return;
     const enter: API.EnterGameEvent = {
-      game: String(router.query.gameId)
+      game: String(props.gameId)
     }
     io.emit(API.Events.Enter, enter, console.log)
-  }, [io, router.query.gameId])
+  }, [io, props.gameId])
 
   const login = useCallback(() => {
     const joinEvent: API.JoinEvent = {
@@ -125,4 +132,28 @@ export default function Home() {
       </main>
     </div>
   )
+}
+
+export default Game;
+
+export const getServerSideProps: GetServerSideProps<GameProps> = async (context) => {
+  const gameId = String(context.query['gameId']);
+  try {
+    const game = await fetchGame(gameId);
+    return {
+      props: {
+        gameId,
+        players: game.players,
+        question: game.question,
+      }
+    }
+  } catch (e) {
+    console.warn(`An error occurred while joining the game with id ${gameId}`, e);
+    return {
+      redirect: {
+        destination: '/?join-game-error=true',
+        permanent: true,
+      }
+    }
+  }
 }

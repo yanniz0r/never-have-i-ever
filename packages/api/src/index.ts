@@ -56,3 +56,7 @@ export interface PlayerJoinedEvent {
   joinedPlayer: IPlayer;
 }
 
+export interface RestGetGameData {
+  players: IPlayer[];
+  question: IQuestion;
+}

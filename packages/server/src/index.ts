@@ -30,6 +30,21 @@ app.post('/game', (_request, response) => {
   });
 });
 
+app.get('/game/:gameId', (request, response) => {
+  const gameId = request.params['gameId']
+  const game = games[gameId]
+  if (!game) {
+    response.status(404).send();
+    return;
+  }
+  const payload: API.RestGetGameData = {
+    question: game.currentQuestion,
+    players: game.players,
+  }
+  response.send(payload)
+  console.log(gameId);
+})
+
 io.on('connection', (socket: Socket) => {
 
   let player: Player;

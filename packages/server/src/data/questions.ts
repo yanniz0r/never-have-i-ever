@@ -52,6 +52,7 @@ const questions = [
   new Question('eine intime Nachricht (unfreiwillig) an einen Kollegen gesendet'),
   new Question('einen Lapdance bekommen/erhalten'),
   new Question('in einer intimen Situation unterbrochen'),
+
 ]
 
 export default questions;
