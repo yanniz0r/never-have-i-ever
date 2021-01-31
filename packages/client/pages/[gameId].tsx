@@ -80,7 +80,7 @@ export default function Home() {
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {!myId && 
+      {!myId &&
         <div className="absolute flex flex-col w-full h-full justify-center items-center z-10">
           <div className="bg-white p-10">
             <h2 className="text-xl font-bold">Dem Spiel beitreten</h2>
@@ -111,7 +111,7 @@ export default function Home() {
             <small className="text-3xl text-white uppercase tracking-wider text-gray-200 flex-shrink">
               Ich habe noch nie...
             </small>
-            <span className="text-5xl text-white mt-4">
+            <span className="text-5xl text-white mt-4 font-bold shadows-into-light">
               {question?.text}
             </span>
           </h1>

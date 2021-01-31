@@ -2,9 +2,9 @@ import express from 'express';
 import http from 'http';
 import * as API from '@nhie/api/dist/index';
 import { Server, Socket } from 'socket.io';
-import { v4 } from 'uuid'
-import Question from './models/question';
-import questions from './data/questions';
+import Game from './models/game'
+import Player from './models/player';
+import cors from 'cors';
 
 const PORT = process.env.PORT || 4000;
 
@@ -16,60 +16,19 @@ const io = new Server(server, {
   }
 });
 
-class Player implements API.IPlayer {
-  public id = v4()
-  constructor(public name: string) {}
-}
+const games: Record<string, Game> = {}
 
-// class ChatMessage {
-//   constructor(public player: Player, public message: string){}
-// }
+app.use(cors({
+  origin: '*',
+}))
 
-class Game {
-  public players: Player[] = [];
-  public remainingQuestions: Question[] = [...questions];
-  public currentQuestion!: Question
-  private answers: Map<Player, boolean> = new Map();
-
-  constructor(public id: string) {
-    this.pickQuestion();
-  }
-
-  public answer(player: Player, answer: boolean) {
-    this.answers.set(player, answer);
-  }
-
-  public allAnswers(): Record<string, boolean> {
-    const answers: Record<string, boolean> = {};
-    this.answers.forEach((value, player) => {
-      answers[player.id] = value;
-    })
-    return answers;
-  }
-
-  public resetAnswers() {
-    this.answers.clear()
-  }
-
-  public everyoneAnswered() {
-    return this.players.length === this.answers.size; 
-  }
-
-  public pickQuestion() {
-    const questionIndex = Math.floor(Math.random() * this.remainingQuestions.length);
-    this.currentQuestion = this.remainingQuestions[questionIndex];
-    this.remainingQuestions = this.remainingQuestions.filter((_, i )=> i !== questionIndex)
-    if (!this.remainingQuestions.length) {
-      this.remainingQuestions = [...questions];
-    }
-    return this.currentQuestion;
-  }
-}
-
-const games: Record<string, Game> = {
-  "1": new Game("1"),
-  "2": new Game("2")
-}
+app.post('/game', (_request, response) => {
+  const game = new Game();
+  games[game.id] = game;
+  response.send({
+    gameId: game.id,
+  });
+});
 
 io.on('connection', (socket: Socket) => {
 
