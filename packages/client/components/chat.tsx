@@ -65,7 +65,7 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
           ? <div className="text-gray-500 text-center font-italic">{message}</div>
           : <div key={index} className="flex">
             <div className="mr-2">
-              <strong className={'rounded-sm ' + twBackgroundClassForColor(colorForString(message.player.name))}>{message.player.name}</strong>
+              <strong className={'rounded-sm ' + twBackgroundClassForColor(colorForString(message.player.id))}>{message.player.name}</strong>
             </div>
             <div className="">
               {message.text}
