@@ -1,13 +1,13 @@
 {
   "name": "@nhie/api",
-  "man": [
-    "dist/index.js"
-  ],
+  "main": "dist/index.js",
   "files": [
     "dist/**/*"
   ],
+  "scripts": {
+    "dev": "tsc -w"
+  },
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "devDependencies": {
     "typescript": "^4.1.3"
