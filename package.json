@@ -8,6 +8,9 @@
     "start": "yarn workspace @nhie/server run start",
     "build": "yarn workspace @nhie/server run build"
   },
+  "engines": {
+    "node": "14.15.4"
+  },
   "workspaces": [
     "packages/client",
     "packages/server",
