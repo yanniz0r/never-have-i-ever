@@ -4,11 +4,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import * as API from '@nhie/api/dist/index';
 import { MdThumbUp, MdThumbDown } from 'react-icons/md'
 import AnswerLabel from '../components/answer-label';
-import { useRouter } from 'next/router';
 import Chat from '../components/chat';
 import { colorForString, twBackgroundClassForColor } from '../util/color-utils';
 import { GetServerSideProps, NextPage } from 'next';
 import { fetchGame } from '../hooks/use-game'
+import getConfig from 'next/config'
+
+const { publicRuntimeConfig } = getConfig()
 
 const twColsClassForPlayerAmount = (player: number) => {
   if (player === 1) {
@@ -39,7 +41,7 @@ const Game: NextPage<GameProps> = (props) => {
     if (typeof window === 'undefined') {
       return;
     }
-    const io = socketio('http://localhost:4000')
+    const io = socketio(publicRuntimeConfig.backendUrl)
     io.on(API.Events.PlayerJoined, (event: API.PlayerJoinedEvent) => {
       setPlayers(event.players);
     })
