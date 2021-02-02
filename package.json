@@ -10,9 +10,6 @@
     "build:client": "APP_PACKAGE=client yarn build",
     "build:server": "APP_PACKAGE=client yarn build"
   },
-  "engines": {
-    "node": "14.15.4"
-  },
   "workspaces": [
     "packages/client",
     "packages/server",
