@@ -1,5 +1,5 @@
 import { IPlayer } from '@nhie/api/dist'
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
+import React, { FC, FormEvent, useCallback, useEffect, useRef, useState } from 'react'
 import * as API from '@nhie/api/dist'
 import { colorForString, twBackgroundClassForColor } from '../util/color-utils';
 
@@ -51,7 +51,8 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
     }
   }, [players, messages])
 
-  const sendMessage = useCallback(() => {
+  const sendMessage = useCallback((event: FormEvent) => {
+    event.preventDefault();
     const sendChatMessageEvent: API.SendChatMessageEvent = {
       message,
     }
@@ -73,10 +74,10 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
           </div>
         )}
       </div>
-      <div className="flex">
+      <form className="flex" onSubmit={sendMessage}>
         <input value={message} onChange={event => setMessage(event.target.value)} placeholder="Nachricht eingeben..." className="p-2 pl-10 bg-transparent flex-grow bg-gray-700 " />
-        <button className="px-5 bg-purple-500 font-bold" onClick={sendMessage}>Senden</button>
-      </div>
+        <button type="submit" name="message" className="px-5 bg-purple-500 font-bold">Senden</button>
+      </form>
     </div>
 }
 
