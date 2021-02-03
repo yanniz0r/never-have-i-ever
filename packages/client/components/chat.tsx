@@ -61,7 +61,7 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
     setMessage("")
   }, [io, message, setMessage])
 
-  return <div className="bg-gray-800 w-full relative">
+  return <div className="bg-gray-800 w-full relative h-full">
       <div className="p-10 h-full overflow-y-scroll" ref={messageContainerRef} >
         {messages.map((message, index) => typeof message === 'string'
           ? <div className="text-gray-500 text-center font-italic text-xs">{message}</div>

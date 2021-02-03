@@ -85,12 +85,32 @@ const Game: NextPage<GameProps> = (props) => {
     io.emit(API.Events.Continue);
   }, [])
 
-  return (
+  return <>
+    <style jsx>{`
+      .page-grid {
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+      }
+
+      @media (max-width: 1630px) {
+        .page-grid {
+          grid-template-columns: 1fr;
+          grid-template-rows: 4fr 1fr;
+        }
+        .chat {
+          height: 30vh;
+        }
+        .game {
+          background: green;
+          order: -1;
+        }
+      }
+    `}</style>
+    <Head>
+      <title>{question.text ? `Ich habe noch nie ${question.text}` : 'Ich habe noch nie...'}</title>
+      <link rel="icon" href="/favicon.ico" />
+    </Head>
     <div className="w-screen h-screen relative">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
       {!myId &&
         <div className="absolute flex flex-col w-full h-full justify-center items-center z-10">
           <div className="bg-white p-10">
@@ -103,9 +123,11 @@ const Game: NextPage<GameProps> = (props) => {
           </div>
         </div>
       }
-      <main className="grid grid-cols-2 h-full" style={{ filter: myId ? 'none' : 'blur(2px)' }}>
-        <Chat io={io} players={players} />
-        <div id="gamearea">
+      <main className="page-grid h-full" style={{ filter: myId ? 'none' : 'blur(2px)' }}>
+        <div className="chat">
+          <Chat io={io} players={players} />
+        </div>
+        <div className="game">
           {phase === API.Phase.RevealAnswers && <div className="text-white bg-gray-900 flex flex-col items-center justify-center h-full">
             <div className="p-10">
               <h2 className="text-gray-500 text-center uppercase mb-4">Auflösung</h2>
@@ -136,7 +158,7 @@ const Game: NextPage<GameProps> = (props) => {
         </div>
       </main>
     </div>
-  )
+  </>
 }
 
 export default Game;

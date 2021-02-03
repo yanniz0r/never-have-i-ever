@@ -2,7 +2,7 @@ import { v4 } from "uuid";
 import questions from "../data/questions";
 import Player from "./player";
 import Question from "./question";
-import * as API from '@nhie/api';
+import * as API from "@nhie/api";
 
 export default class Game {
   public players: Player[] = [];

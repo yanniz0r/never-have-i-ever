@@ -1,6 +1,7 @@
 {
   "name": "@nhie/api",
   "main": "dist/index.js",
+  "module": "dist/index.js",
   "files": [
     "dist/**/*"
   ],
