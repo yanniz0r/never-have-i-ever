@@ -40,6 +40,7 @@ app.get('/game/:gameId', (request, response) => {
   const payload: API.RestGetGameData = {
     question: game.currentQuestion,
     players: game.players,
+    phase: game.phase,
   }
   response.send(payload)
   console.log(gameId);
@@ -90,20 +91,37 @@ io.on('connection', (socket: Socket) => {
     ack(player.id)
   })
 
+  socket.on(API.Events.Continue, () => {
+    if (game.phase === API.Phase.RevealAnswers) {
+      game.phase = API.Phase.Answer;
+      game.resetAnswers();
+      io.to(game.id).emit(API.Events.PlayerAnswered, {
+        playerAnswers: game.allAnswers(),
+        player,
+      } as API.PlayerAnsweredEvent);
+      io.emit(API.Events.ShowQuestion, {
+        question: game.pickQuestion(),
+      } as API.ShowQuestionEvent)
+      io.emit(API.Events.PhaseChange, {
+        phase: game.phase
+      } as API.PhaseChangeEvent)
+    }
+  })
+
   socket.on(API.Events.Answer, (event: API.AnswerEvent) => {
     if (!player) {
       return
     }
     game.answer(player, event.answer);
     if (game.everyoneAnswered()) {
-      game.resetAnswers();
-      const showQuestionEvent: API.ShowQuestionEvent = {
-        question: game.pickQuestion()
-      }
-      io.to(game.id).emit(API.Events.ShowQuestion, showQuestionEvent)
+      game.phase = API.Phase.RevealAnswers
+      io.emit(API.Events.PhaseChange, {
+        phase: game.phase,
+      } as API.PhaseChangeEvent);
     }
     const playerAnsweredEvent: API.PlayerAnsweredEvent = {
-      playerAnswers: game.allAnswers()
+      playerAnswers: game.allAnswers(),
+      player,
     }
     io.to(game.id).emit(API.Events.PlayerAnswered, playerAnsweredEvent);
   })

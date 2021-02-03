@@ -1,33 +1,21 @@
 import Head from 'next/head'
 import socketio from 'socket.io-client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import * as API from '@nhie/api/dist/index';
+import * as API from '@nhie/api';
 import { MdThumbUp, MdThumbDown } from 'react-icons/md'
-import AnswerLabel from '../components/answer-label';
 import Chat from '../components/chat';
-import { colorForString, twBackgroundClassForColor } from '../util/color-utils';
 import { GetServerSideProps, NextPage } from 'next';
 import { fetchGame } from '../hooks/use-game'
 import getConfig from 'next/config'
+import PlayerAnswerList from '../components/player-answer-list';
 
 const { publicRuntimeConfig } = getConfig()
-
-const twColsClassForPlayerAmount = (player: number) => {
-  if (player === 1) {
-    return 'grid-cols-1';
-  } else if (player < 6) {
-    return 'grid-cols-2';
-  } else if (player < 12) {
-    return 'grid-cols-3';
-  } else {
-    return 'grid-cols-4';
-  }
-}
 
 interface GameProps {
   gameId: string;
   players: API.IPlayer[];
   question: API.IQuestion;
+  phase: API.Phase;
 }
 
 const Game: NextPage<GameProps> = (props) => {
@@ -36,6 +24,8 @@ const Game: NextPage<GameProps> = (props) => {
   const [username, setUsername] = useState<string>("");
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
   const [question, setQuestion] = useState<API.IQuestion>(props.question);
+  const [phase, setPhase] = useState<API.Phase>(props.phase);
+  const [hasAnswered, setHasAnswered] = useState(false)
 
   const io = useMemo(() => {
     if (typeof window === 'undefined') {
@@ -50,6 +40,12 @@ const Game: NextPage<GameProps> = (props) => {
     })
     io.on(API.Events.PlayerAnswered, (event: API.PlayerAnsweredEvent) => {
       setAnswers(event.playerAnswers);
+    })
+    io.on(API.Events.PhaseChange, (event: API.PhaseChangeEvent) => {
+      if (event.phase === API.Phase.Answer) {
+        setHasAnswered(false);
+      }
+      setPhase(event.phase);
     })
     return io
   }, []);
@@ -70,6 +66,7 @@ const Game: NextPage<GameProps> = (props) => {
   }, [username])
 
   const yay = useCallback(() => {
+    setHasAnswered(true);
     const playerAnswerEvent: API.AnswerEvent = {
       answer: true
     };
@@ -77,14 +74,19 @@ const Game: NextPage<GameProps> = (props) => {
   }, [])
 
   const nay = useCallback(() => {
+    setHasAnswered(true);
     const playerAnswerEvent: API.AnswerEvent = {
       answer: false
     };
     io.emit(API.Events.Answer, playerAnswerEvent);
   }, [])
 
+  const continueGame = useCallback(() => {
+    io.emit(API.Events.Continue);
+  }, [])
+
   return (
-    <div className="w-screen h-screen bg-red-100 relative">
+    <div className="w-screen h-screen relative">
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
@@ -102,35 +104,36 @@ const Game: NextPage<GameProps> = (props) => {
         </div>
       }
       <main className="grid grid-cols-2 h-full" style={{ filter: myId ? 'none' : 'blur(2px)' }}>
-        <div className="text-white bg-gray-900 flex flex-col items-center justify-center">
-          <div className={`grid p-10 flex-grow gap-16 ${twColsClassForPlayerAmount(players.length)}`}>
-            {players.map((player, index) => (
-              <div key={index} className={`flex justify-center items-center flex-col transform transition ${answers[player.id] && 'scale-125'}`}>
-                <div className={`w-24 h-24 text-5xl flex items-center justify-center rounded-full ${twBackgroundClassForColor(colorForString(player.id))}`}>
-                  <AnswerLabel answer={answers[player.id]}>{player.name[0].toUpperCase()}</AnswerLabel>
-                </div>
-                <h3 className="text-2xl mt-2">{player.name}</h3>
-              </div>
-            ))}
-          </div>
-          <Chat io={io} players={players} />
+        <Chat io={io} players={players} />
+        <div id="gamearea">
+          {phase === API.Phase.RevealAnswers && <div className="text-white bg-gray-900 flex flex-col items-center justify-center h-full">
+            <div className="p-10">
+              <h2 className="text-gray-500 text-center uppercase mb-4">Auflösung</h2>
+              <h1 className="text-white text-center shadows-into-light text-5xl">Ich habe noch nie {question?.text}</h1>
+            </div>
+            <div className="flex-grow flex justify-center items-center">
+              <PlayerAnswerList players={players} answers={answers} />
+            </div>
+            <div className="p-10">
+              <button onClick={continueGame} className="bg-purple-500 text-white font-bold p-2 px-4 rounded-lg">Nächste Frage</button>
+            </div>
+          </div>}
+          {phase === API.Phase.Answer && <div className="flex justify-center items-center flex-col bg-gradient-to-br from-blue-300 via-purple-400 to-green-300 p-10 h-full">
+            <h1 className="flex flex-col text-center">
+              <small className="text-3xl text-white uppercase tracking-wider text-gray-200 flex-shrink">
+                Ich habe noch nie...
+              </small>
+              <span className="text-5xl text-white mt-4 font-bold shadows-into-light">
+                {question?.text}
+              </span>
+            </h1>
+            <p className="mt-16 mb-5 text-center">Jetzt bist du gefragt! Hast du das schonmal gemacht/getan?</p>
+            <div className="grid gap-5 grid-cols-2">
+              <button disabled={hasAnswered} onClick={yay} className="disabled:opacity-50 text-4xl h-24 w-24 bg-green-500 rounded-full flex flex-col justify-center items-center text-white"><MdThumbUp /><span className="text-xs">Yay</span></button>
+              <button disabled={hasAnswered} onClick={nay} className="disabled:opacity-50 text-4xl h-24 w-24 bg-red-500 rounded-full flex flex-col justify-center items-center text-white"><MdThumbDown /><span className="text-xs">Nay</span></button>
+            </div>
+          </div>}
         </div>
-        <div className="flex justify-center items-center flex-col bg-gradient-to-br from-blue-300 via-purple-400 to-green-300 p-10">
-          <h1 className="flex flex-col text-center">
-            <small className="text-3xl text-white uppercase tracking-wider text-gray-200 flex-shrink">
-              Ich habe noch nie...
-            </small>
-            <span className="text-5xl text-white mt-4 font-bold shadows-into-light">
-              {question?.text}
-            </span>
-          </h1>
-          <p className="mt-16 mb-5 text-center">Jetzt bist du gefragt! Hast du das schonmal gemacht/getan?</p>
-          <div className="grid gap-5 grid-cols-2">
-            <button onClick={yay} className="text-4xl h-24 w-24 bg-green-500 rounded-full flex flex-col justify-center items-center text-white"><MdThumbUp /><span className="text-xs">Yay</span></button>
-            <button onClick={nay} className="text-4xl h-24 w-24 bg-red-500 rounded-full flex flex-col justify-center items-center text-white"><MdThumbDown /><span className="text-xs">Nay</span></button>
-          </div>
-        </div>
-
       </main>
     </div>
   )
@@ -147,6 +150,7 @@ export const getServerSideProps: GetServerSideProps<GameProps> = async (context)
         gameId,
         players: game.players,
         question: game.question,
+        phase: game.phase,
       }
     }
   } catch (e) {

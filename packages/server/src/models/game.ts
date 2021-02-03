@@ -2,11 +2,14 @@ import { v4 } from "uuid";
 import questions from "../data/questions";
 import Player from "./player";
 import Question from "./question";
+import * as API from '@nhie/api';
 
 export default class Game {
   public players: Player[] = [];
   public remainingQuestions: Question[] = [...questions];
   public currentQuestion!: Question;
+  public phase = API.Phase.Answer;
+
   private answers: Map<Player, boolean> = new Map();
 
   constructor(public id: string = v4()) {
@@ -30,7 +33,7 @@ export default class Game {
   }
 
   public everyoneAnswered() {
-    return this.players.length === this.answers.size; 
+    return this.players.length === this.answers.size;
   }
 
   public pickQuestion() {
@@ -43,4 +46,3 @@ export default class Game {
     return this.currentQuestion;
   }
 }
-  

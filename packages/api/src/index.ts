@@ -7,10 +7,21 @@ export enum Events {
   PlayerAnswered = 'player-answered',
   SendChatMessage = 'send-chat-message',
   ReceiveChatMessage = 'receive-chat-message',
+  PhaseChange = 'phase-change',
+  Continue = 'continue'
+}
+
+export enum Phase {
+  Answer = 'answer',
+  RevealAnswers = 'reveal-answer',
 }
 
 export interface IQuestion {
   text: string;
+}
+
+export interface PhaseChangeEvent {
+  phase: Phase;
 }
 
 export interface ReceiveChatMessageEvent {
@@ -23,6 +34,7 @@ export interface SendChatMessageEvent {
 }
 
 export interface PlayerAnsweredEvent {
+  player: IPlayer;
   playerAnswers: Record<string, boolean>;
 }
 
@@ -59,4 +71,5 @@ export interface PlayerJoinedEvent {
 export interface RestGetGameData {
   players: IPlayer[];
   question: IQuestion;
+  phase: Phase;
 }
