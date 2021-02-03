@@ -28,6 +28,7 @@ const PlayerAnswerList: FC<PlayerAnswerListProps> = ({ players, answers }) => {
       const timeoutId = setTimeout(() => {
         setRevealIndex(revealIndex + 1);
       }, 1000)
+      return () => clearTimeout(timeoutId);
     }
   }, [revealIndex, players.length])
 
