@@ -6,13 +6,14 @@
   "private": true,
   "scripts": {
     "start": "yarn workspace @nhie/$APP_PACKAGE run start",
-    "build": "yarn workspace @nhie/$APP_PACKAGE run build",
+    "build": "yarn workspace @nhie/api run build && yarn workspace @nhie/$APP_PACKAGE run build",
     "build:client": "APP_PACKAGE=client yarn build",
     "build:server": "APP_PACKAGE=client yarn build",
     "dev:api": "yarn workspace @nhie/api dev",
     "dev:server": "yarn workspace @nhie/server dev",
     "dev:client": "yarn workspace @nhie/client dev",
-    "dev": "concurrently --prefix-colors \"red,green,blue\" \"yarn:dev:server\" \"yarn:dev:client\" \"yarn:dev:api\""
+    "dev": "concurrently --prefix-colors \"red,green,blue\" \"yarn:dev:server\" \"yarn:dev:client\" \"yarn:dev:api\"",
+    "deploy": "git push dokku main"
   },
   "workspaces": [
     "packages/client",

@@ -1,6 +1,6 @@
 import express from 'express';
 import http from 'http';
-import * as API from '@nhie/api/dist/index';
+import * as API from '@nhie/api';
 import { Server, Socket } from 'socket.io';
 import Game from './models/game'
 import Player from './models/player';
