@@ -5,6 +5,7 @@ import { Server, Socket } from 'socket.io';
 import Game from './models/game'
 import Player from './models/player';
 import cors from 'cors';
+import questions from './data/questions';
 
 const PORT = process.env.PORT || 4000;
 
@@ -29,6 +30,10 @@ app.post('/game', (_request, response) => {
     gameId: game.id,
   });
 });
+
+app.get('/question/random', (_request, response) => {
+  response.send(questions[Math.floor(Math.random() * questions.length)]);
+})
 
 app.get('/game/:gameId', (request, response) => {
   const gameId = request.params['gameId']

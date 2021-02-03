@@ -3,6 +3,17 @@
   src: url('/fonts/ShadowsIntoLight-Regular.ttf')  format('truetype');
 }
 
+@font-face {
+  font-family: 'Poppins-Regular';
+  src: url('/fonts/Poppins-Regular.ttf')  format('truetype');
+}
+
+
+
+* {
+  font-family: "Poppins-Regular";
+}
+
 .shadows-into-light {
   font-family: "ShadowsIntoLight-Regular";
 }
