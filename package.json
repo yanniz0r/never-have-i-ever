@@ -14,9 +14,6 @@
     "dev:client": "yarn workspace @nhie/client dev",
     "dev": "concurrently --prefix-colors \"red,green,blue\" \"yarn:dev:server\" \"yarn:dev:client\" \"yarn:dev:api\""
   },
-  "engines": {
-    "node": "14.15.4"
-  },
   "workspaces": [
     "packages/client",
     "packages/server",
