@@ -112,7 +112,7 @@ const Game: NextPage<GameProps> = (props) => {
       }
     `}</style>
     <Head>
-      <title>{question.text ? `Ich habe noch nie ${question.text}` : 'Ich habe noch nie...'}</title>
+      <title>{question.text ? question.text : 'Ich habe noch nie...'}</title>
       <link rel="icon" href="/favicon.ico" />
     </Head>
     <div className="w-screen h-screen relative">
