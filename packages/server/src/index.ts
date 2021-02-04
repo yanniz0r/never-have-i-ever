@@ -115,10 +115,6 @@ io.on('connection', (socket: Socket) => {
     if (game.phase === API.Phase.RevealAnswers) {
       game.phase = API.Phase.Answer;
       game.resetAnswers();
-      io.to(game.id).emit(API.Events.PlayerAnswered, {
-        playerAnswers: game.allAnswers(),
-        player,
-      } as API.PlayerAnsweredEvent);
       io.emit(API.Events.ShowQuestion, {
         question: game.pickQuestion(),
       } as API.ShowQuestionEvent)

@@ -47,6 +47,8 @@ const Game: NextPage<GameProps> = (props) => {
     io.on(API.Events.PhaseChange, (event: API.PhaseChangeEvent) => {
       if (event.phase === API.Phase.Answer) {
         setHasAnswered(false);
+      } else {
+        setAnswers({});
       }
       setPhase(event.phase);
     })
