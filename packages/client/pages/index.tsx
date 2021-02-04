@@ -59,7 +59,7 @@ const HomePage: NextPage<HomePageProps> = (props) => {
     </>
     <div className="bg-gradient-to-r from-purple-500 to-purple-900 py-24">
       <div className="mx-auto px-5 max-w-screen-lg">
-        <h1 className="text-white text-3xl md:text-8xl">Ich habe noch nie {props.question.text}</h1>
+        <h1 className="text-white text-3xl md:text-8xl">{props.question.text}</h1>
         <p className="mt-5 text-lg md:text-xl">Finde heraus was für Laster deine Freunde, Kollegen oder Bekannten haben. Online, Offline oder allein.</p>
       </div>
     </div>

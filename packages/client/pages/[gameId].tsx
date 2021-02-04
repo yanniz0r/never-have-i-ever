@@ -136,7 +136,7 @@ const Game: NextPage<GameProps> = (props) => {
           {phase === API.Phase.RevealAnswers && <div className="text-white bg-gray-900 flex flex-col items-center justify-center h-full">
             <div className="p-10">
               <h2 className="text-gray-500 text-center uppercase mb-4">Auflösung</h2>
-              <h1 className="text-white text-center shadows-into-light text-5xl">Ich habe noch nie {question?.text}</h1>
+              <h1 className="text-white text-center shadows-into-light text-5xl">{question?.text}</h1>
             </div>
             <div className="flex-grow flex justify-center items-center">
               <PlayerAnswerList players={players} answers={answers} />
@@ -148,7 +148,7 @@ const Game: NextPage<GameProps> = (props) => {
           {phase === API.Phase.Answer && <div className="flex justify-center items-center flex-col bg-gradient-to-br from-blue-300 via-purple-400 to-green-300 p-10 h-full">
             <h1 className="flex flex-col text-center">
               <small className="text-3xl text-white uppercase tracking-wider text-gray-200 flex-shrink">
-                Ich habe noch nie...
+                Die Frage...
               </small>
               <span className="text-5xl text-white mt-4 font-bold shadows-into-light">
                 {question?.text}
