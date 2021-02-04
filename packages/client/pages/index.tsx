@@ -132,6 +132,10 @@ const HomePage: NextPage<HomePageProps> = (props) => {
             <p className="text-4xl text-right">"ich soll was gutes zum Game sagen... joa"</p>
             <span className="text-gray-300 mt-4">- TheMutlu311, 2021</span>
           </div>
+          <div className="mt-10">
+            <p className="text-4xl">"In der Zukunft wird neverhaveiever.de steiler gehen als Gamestop. save.."</p>
+            <span className="text-gray-300 mt-4">- mcpebooster_ 2021</span>
+          </div>
         </div>
       </div>
       <span className="absolute bottom-0.5 right-0.5 text-xs opacity-50">Photo by <a href="https://unsplash.com/@katweil?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Kats Weil</a> on <a href="https://unsplash.com/s/photos/alcohol-party?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
