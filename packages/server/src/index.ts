@@ -6,6 +6,7 @@ import Game from './models/game'
 import Player from './models/player';
 import cors from 'cors';
 import questions from './data/questions';
+import { debug } from './logger';
 
 const PORT = process.env.PORT || 4000;
 
@@ -67,13 +68,27 @@ io.on('connection', (socket: Socket) => {
       socket.emit(API.Events.ShowQuestion, showQuestionEvent);
       ack?.(true);
     } else {
+      debug(`Game with id ${event.game} does not exist`)
       ack?.(false);
     }
   })
 
   socket.on('disconnect', () => {
+    console.log({ player })
     if (player) {
+      debug(`Player ${player.id} left the game`, { game })
       game.players = game.players.filter(p => p !== player);
+      const playerLeftEvent: API.PlayerLeftEvent = {
+        leftPlayer: player,
+        players: game.players,
+      }
+      io.to(game.id).emit(API.Events.PlayerLeft, playerLeftEvent)
+      if (game.everyoneAnswered()) {
+        game.phase = API.Phase.RevealAnswers
+        io.emit(API.Events.PhaseChange, {
+          phase: game.phase,
+        } as API.PhaseChangeEvent);
+      }
     }
   })
 

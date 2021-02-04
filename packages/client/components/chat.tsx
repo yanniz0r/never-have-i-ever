@@ -48,6 +48,14 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
     }
     io.on(API.Events.PlayerJoined, playerJoined);
 
+    const playerLeft = (event: API.PlayerLeftEvent) => {
+      setMessages((oldMessages) => [
+        ...oldMessages,
+        `${event.leftPlayer.name} hat das Spiel verlassen`
+      ])
+    }
+    io.on(API.Events.PlayerLeft, playerLeft);
+
     const playerAnswered = (event: API.PlayerAnsweredEvent) => {
       setMessages((oldMessages) => [
         ...oldMessages,
@@ -57,9 +65,10 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
     io.on(API.Events.PlayerAnswered, playerAnswered);
 
     return () => {
-      io.removeEventListener(API.Events.ReceiveChatMessage, receiveChatMessage);
-      io.removeEventListener(API.Events.PlayerJoined, playerJoined);
-      io.removeEventListener(API.Events.PlayerAnswered, playerAnswered);
+      io.off(API.Events.ReceiveChatMessage, receiveChatMessage);
+      io.off(API.Events.PlayerJoined, playerJoined);
+      io.off(API.Events.PlayerLeft, playerLeft);
+      io.off(API.Events.PlayerAnswered, playerAnswered);
     }
   }, [players])
 

@@ -2,6 +2,7 @@ export enum Events {
   Join = 'join',
   Enter = 'enter',
   PlayerJoined = 'player-joined',
+  PlayerLeft = 'player-left',
   ShowQuestion = 'show-question',
   Answer = 'answer',
   PlayerAnswered = 'player-answered',
@@ -66,6 +67,11 @@ export interface AnswerEvent {
 export interface PlayerJoinedEvent {
   players: IPlayer[];
   joinedPlayer: IPlayer;
+}
+
+export interface PlayerLeftEvent {
+  players: IPlayer[];
+  leftPlayer: IPlayer;
 }
 
 export interface RestGetGameData {

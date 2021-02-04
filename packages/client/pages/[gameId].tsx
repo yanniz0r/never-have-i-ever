@@ -35,6 +35,9 @@ const Game: NextPage<GameProps> = (props) => {
     io.on(API.Events.PlayerJoined, (event: API.PlayerJoinedEvent) => {
       setPlayers(event.players);
     })
+    io.on(API.Events.PlayerLeft, (event: API.PlayerLeftEvent) => {
+      setPlayers(event.players);
+    })
     io.on(API.Events.ShowQuestion, (event: API.ShowQuestionEvent) => {
       setQuestion(event.question);
     })
@@ -49,6 +52,8 @@ const Game: NextPage<GameProps> = (props) => {
     })
     return io
   }, []);
+
+  console.log({ players })
 
   useEffect(() => {
     if (!io) return;
