@@ -75,7 +75,7 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
   return <div className="bg-gray-800 w-full relative h-full">
       <div className="p-10 h-full overflow-y-scroll" ref={messageContainerRef} >
         {messages.map((message, index) => typeof message === 'string'
-          ? <div className="text-gray-500 text-center font-italic text-xs">{message}</div>
+          ? <div key={index} className="text-gray-500 text-center font-italic text-xs">{message}</div>
           : <div key={index} className="flex text-white">
             <div className="mr-2">
               <strong className={'rounded-sm px-1 ' + twBackgroundClassForColor(colorForString(message.player.id))}>{message.player.name}</strong>
