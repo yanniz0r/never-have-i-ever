@@ -66,7 +66,7 @@ const HomePage: NextPage<HomePageProps> = (props) => {
     <div className="py-20 bg-gray-800">
       <div className="mx-auto px-5 max-w-screen-lg">
         <div className="grid grid-cols-1 sm:grid-cols-3 text-gray-400 text-2xl gap-20 text-center">
-          <div className="text-center flex flex-col items-center justify-center"><MdQuestionAnswer className="text-green-500 text-4xl mb-5" />Mehr als 50 extrem würzige Fragen</div>
+          <div className="text-center flex flex-col items-center justify-center"><MdQuestionAnswer className="text-green-500 text-4xl mb-5" />Mehr als 100 extrem würzige Fragen</div>
           <div className="text-center flex flex-col items-center justify-center"><FaHeart className="text-red-400 text-4xl mb-5" /> Gebaut mit Herz und Twitch</div>
           <div className="text-center flex flex-col items-center justify-center"><FaNetworkWired className="text-blue-500 text-4xl mb-5" /> Lokal und Online Spielbar</div>
         </div>
