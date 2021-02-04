@@ -6,6 +6,7 @@ import { MdError, MdQuestionAnswer, MdVideogameAsset } from "react-icons/md";
 import { FaGithub, FaHeart, FaNetworkWired } from "react-icons/fa"
 import useCreateGameMutation from "../hooks/use-create-game-mutation";
 import getConfiguration from 'next/config';
+import Head from "next/head";
 
 interface HomePageProps {
   question: IQuestion;
@@ -27,6 +28,9 @@ const HomePage: NextPage<HomePageProps> = (props) => {
 
 
   return <div>
+    <Head>
+      <title>Ich habe noch nie... online!</title>
+    </Head>
     <div className="bg-gray-900" id="navigation">
       <div className="mx-auto max-w-screen-lg px-5">
         <div className="flex">
