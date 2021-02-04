@@ -158,8 +158,8 @@ const Game: NextPage<GameProps> = (props) => {
             </h1>
             <p className="mt-16 mb-5 text-center">Jetzt bist du gefragt! Hast du das schonmal gemacht/getan?</p>
             <div className="grid gap-5 grid-cols-2">
-              <button disabled={hasAnswered} onClick={yay} className="disabled:opacity-50 text-4xl h-24 w-24 bg-green-500 rounded-full flex flex-col justify-center items-center text-white"><MdThumbUp /><span className="text-xs">Yay</span></button>
-              <button disabled={hasAnswered} onClick={nay} className="disabled:opacity-50 text-4xl h-24 w-24 bg-red-500 rounded-full flex flex-col justify-center items-center text-white"><MdThumbDown /><span className="text-xs">Nay</span></button>
+              <button disabled={hasAnswered} onClick={yay} className="disabled:opacity-50 text-4xl h-24 w-24 bg-green-500 rounded-full flex flex-col justify-center items-center text-white"><MdThumbUp /><span className="text-xs">Stimmt</span></button>
+              <button disabled={hasAnswered} onClick={nay} className="disabled:opacity-50 text-4xl h-24 w-24 bg-red-500 rounded-full flex flex-col justify-center items-center text-white"><MdThumbDown /><span className="text-xs">Stimmt nicht</span></button>
             </div>
           </div>}
         </div>

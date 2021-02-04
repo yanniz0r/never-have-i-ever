@@ -8,7 +8,7 @@ const AnswerLabel: FC<AnswerLabelProps> = ({ answer, children }) => {
   if (answer === undefined) {
     return <>{children}</>;
   }
-  return <>{ answer ? '😈' : '😇'}</>
+  return <>{ answer ? '😇' : '😈'}</>
 }
 
 export default AnswerLabel;
