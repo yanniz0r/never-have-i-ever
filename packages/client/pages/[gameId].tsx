@@ -118,9 +118,9 @@ const Game: NextPage<GameProps> = (props) => {
     <div className="w-screen h-screen relative">
       {!myId &&
         <div className="absolute flex flex-col w-full h-full justify-center items-center z-10">
-          <div className="bg-white p-10">
+          <div className="bg-white p-7 rounded-xl">
             <h2 className="text-xl font-bold">Dem Spiel beitreten</h2>
-            <p className="text-md mt-1 text-gray-500">Sag uns wie du heißt und du bist gleich mit dabei!</p>
+            <p className="text-md mt-3 text-gray-500">Sag uns wie du heißt und du bist gleich mit dabei!</p>
             <div className="flex mt-5">
               <input type="text" value={username} className="flex-grow border-t border-b border-l border-gray-200 rounded-l-xl p-2" onChange={(event) => setUsername(event.currentTarget.value)} />
               <button onClick={login} className="bg-purple-500 text-white p-2 px-4 rounded-r-xl">Beitreten</button>
