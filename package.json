@@ -5,10 +5,10 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "yarn workspace @nhie/$APP_PACKAGE run start",
-    "build": "yarn workspace @nhie/api run build && yarn workspace @nhie/$APP_PACKAGE run build",
+    "start": "yarn workspace @nhie/server run start",
+    "build": "yarn workspace @nhie/api run build && yarn workspace @nhie/server run build",
     "build:client": "APP_PACKAGE=client yarn build",
-    "build:server": "APP_PACKAGE=client yarn build",
+    "build:server": "APP_PACKAGE=server yarn build",
     "dev:api": "yarn workspace @nhie/api dev",
     "dev:server": "yarn workspace @nhie/server dev",
     "dev:client": "yarn workspace @nhie/client dev",
