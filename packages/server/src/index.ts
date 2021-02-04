@@ -7,6 +7,7 @@ import Player from './models/player';
 import cors from 'cors';
 import questions from './data/questions';
 import { debug } from './logger';
+import generateGameId from './generate-game-id';
 
 const PORT = process.env.PORT || 4000;
 
@@ -25,7 +26,11 @@ app.use(cors({
 }))
 
 app.post('/game', (_request, response) => {
-  const game = new Game();
+  let id: string;
+  do {
+    id = generateGameId();
+  } while (Object.keys(games).includes(id))
+  const game = new Game(id);
   games[game.id] = game;
   response.send({
     gameId: game.id,
