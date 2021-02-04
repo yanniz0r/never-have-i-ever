@@ -19,15 +19,15 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
   const [messages, setMessages] = useState<Array<ChatMessage | string>>([]);
 
   useEffect(() => {
-    io.on(API.Events.ReceiveChatMessage, (event: API.ReceiveChatMessageEvent) => {
+    const receiveChatMessage = (event: API.ReceiveChatMessageEvent) => {
       const player = players.find(p => p.id === event.playerId);
       if (!player) {
         console.log(players)
         console.warn(`Player with ID ${event.playerId} is not currently connected to the game.`)
         return;
       }
-      setMessages([
-        ...messages,
+      setMessages(oldMessages => [
+        ...oldMessages,
         {
           text: event.message,
           player,
@@ -37,20 +37,31 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
         top: messageContainerRef.current.scrollHeight,
         behavior: 'smooth',
       })
-    })
-    io.on(API.Events.PlayerJoined, (event: API.PlayerJoinedEvent) => {
-      setMessages([
-        ...messages,
+    }
+    io.on(API.Events.ReceiveChatMessage, receiveChatMessage)
+
+    const playerJoined = (event: API.PlayerJoinedEvent) => {
+      setMessages((oldMessages) => [
+        ...oldMessages,
         `${event.joinedPlayer.name} ist dem Spiel beigetreten`
       ])
-    });
-    io.on(API.Events.PlayerAnswered, (event: API.PlayerAnsweredEvent) => {
-      setMessages([
-        ...messages,
+    }
+    io.on(API.Events.PlayerJoined, playerJoined);
+
+    const playerAnswered = (event: API.PlayerAnsweredEvent) => {
+      setMessages((oldMessages) => [
+        ...oldMessages,
         `${event.player.name} hat geantwortet`
       ])
-    });
-  }, [players, messages])
+    }
+    io.on(API.Events.PlayerAnswered, playerAnswered);
+
+    return () => {
+      io.removeEventListener(API.Events.ReceiveChatMessage, receiveChatMessage);
+      io.removeEventListener(API.Events.PlayerJoined, playerJoined);
+      io.removeEventListener(API.Events.PlayerAnswered, playerAnswered);
+    }
+  }, [players])
 
   const sendMessage = useCallback((event: FormEvent) => {
     event.preventDefault();
@@ -78,7 +89,7 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
       <div className="absolute p-10 bottom-0 w-full">
         <form className="flex shadow-lg overflow-hidden rounded-lg" onSubmit={sendMessage}>
           <input value={message} onChange={event => setMessage(event.target.value)} placeholder="Nachricht eingeben..." className="p-2 px-4 text-white bg-transparent flex-grow bg-gray-700 " />
-          <button type="submit" name="message" className="px-5 bg-purple-500 font-bold text-white">Senden</button>
+          <button type="submit" name="message" className="px-5 bg-purple-500 font-bold text-white" disabled={message.length < 1}>Senden</button>
         </form>
       </div>
     </div>
