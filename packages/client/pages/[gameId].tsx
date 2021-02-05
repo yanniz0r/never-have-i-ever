@@ -9,6 +9,8 @@ import { fetchGame } from '../hooks/use-game'
 import getConfig from 'next/config'
 import PlayerAnswerList from '../components/player-answer-list';
 import Countdown from '../components/countdown';
+import Modal from '../components/modal';
+import { FaShare } from 'react-icons/fa';
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -27,6 +29,8 @@ const Game: NextPage<GameProps> = (props) => {
   const [question, setQuestion] = useState<API.IQuestion>(props.question);
   const [phase, setPhase] = useState<API.Phase>(props.phase);
   const [hasAnswered, setHasAnswered] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareModalJustCopied, setShareModalJustCopied] = useState(false);
   const [countdownEnd, setCountdownEnd] = useState<Date>();
 
   const io = useMemo(() => {
@@ -118,22 +122,46 @@ const Game: NextPage<GameProps> = (props) => {
     </Head>
     <div className="w-screen h-screen relative">
       {!myId &&
-        <div className="absolute flex flex-col w-full h-full justify-center items-center z-10">
-          <div className="bg-white p-7 rounded-xl">
-            <h2 className="text-xl font-bold">Dem Spiel beitreten</h2>
-            <p className="text-md mt-3 text-gray-500">Sag uns wie du heißt und du bist gleich mit dabei!</p>
-            <div className="flex mt-5">
-              <input type="text" value={username} className="flex-grow border-t border-b border-l border-gray-200 rounded-l-xl p-2" onChange={(event) => setUsername(event.currentTarget.value)} />
-              <button onClick={login} className="bg-purple-500 text-white p-2 px-4 rounded-r-xl">Beitreten</button>
-            </div>
+        <Modal>
+          <h2 className="text-xl font-bold">Dem Spiel beitreten</h2>
+          <p className="text-md mt-3 text-gray-500">Sag uns wie du heißt und du bist gleich mit dabei!</p>
+          <div className="flex mt-5">
+            <input type="text" value={username} className="flex-grow border-t border-b border-l border-gray-200 rounded-l-xl p-2" onChange={(event) => setUsername(event.currentTarget.value)} />
+            <button onClick={login} className="bg-purple-500 text-white p-2 px-4 rounded-r-xl">Beitreten</button>
           </div>
-        </div>
+        </Modal>
+      }
+      {shareModalOpen &&
+        <Modal close={() => setShareModalOpen(false)}>
+          <h2 className="text-xl font-bold">Zum Spiel einladen</h2>
+          <p className="text-md mt-3 text-gray-500">Kopiere dir einfach den untenstehenden Code und teile ihn mit deinen Mitspielern. Wenn du sie magst, kannst du ihnen auch einfach den Link schicken.</p>
+          <input
+            value={props.gameId}
+            onClick={() => {
+              navigator.clipboard.writeText(props.gameId);
+              setShareModalJustCopied(true);
+              setTimeout(() => {
+                setShareModalJustCopied(false);
+              }, 2000);
+            }}
+            className="font-mono cursor-pointer bg-gray-100 p-2 w-full rounded-lg mt-4"
+          />
+          <span className={`inline-block text-white bg-black p-1 text-xs rounded-lg transition transform ${shareModalJustCopied ? 'scale-100' : 'scale-0'}`}>
+            Kopiert
+          </span>
+        </Modal>
       }
       <main className="page-grid h-full" style={{ filter: myId ? 'none' : 'blur(2px)' }}>
         <div className="chat">
           <Chat io={io} players={players} />
         </div>
-        <div className="game">
+        <div className="game relative">
+          <div className="absolute bottom-12 right-12">
+            <button onClick={() => setShareModalOpen(true)} className="flex text-black text-opacity-50 hover:text-opacity-80 transition justify-center items-center flex-col">
+              <FaShare className="text-xl md:text-4xl"/>
+              <span className="text-xs">Teilen</span>
+            </button>
+          </div>
           {phase === API.Phase.RevealAnswers && <div className="text-white bg-gray-900 flex flex-col items-center justify-center h-full">
             <div className="p-10">
               <h2 className="text-gray-500 text-center uppercase mb-4">Auflösung</h2>
