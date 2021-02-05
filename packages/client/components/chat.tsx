@@ -80,8 +80,8 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
     setMessage("")
   }, [io, message, setMessage])
 
-  return <div className="bg-gray-800 w-full relative h-full">
-      <div className="p-10 h-full overflow-y-scroll" ref={messageContainerRef} >
+  return <div className="bg-gray-800 w-full h-full p-10 flex flex-col">
+      <div className="overflow-y-scroll flex-grow" ref={messageContainerRef} >
         {messages.map((message, index) => typeof message === 'string'
           ? <div key={index} className="text-gray-500 text-center font-italic text-xs">{message}</div>
           : <div key={index} className="flex text-white">
@@ -94,12 +94,10 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
           </div>
         )}
       </div>
-      <div className="absolute p-10 bottom-0 w-full">
-        <form className="flex shadow-lg overflow-hidden rounded-lg" onSubmit={sendMessage}>
-          <input value={message} onChange={event => setMessage(event.target.value)} placeholder="Nachricht eingeben..." className="p-2 px-4 text-white bg-transparent flex-grow bg-gray-700 " />
-          <button type="submit" name="message" className="px-5 bg-purple-500 font-bold text-white" disabled={message.length < 1}>Senden</button>
-        </form>
-      </div>
+      <form className="flex shadow-lg overflow-hidden rounded-lg mt-2" onSubmit={sendMessage}>
+        <input value={message} onChange={event => setMessage(event.target.value)} placeholder="Nachricht eingeben..." className="p-2 px-4 text-white bg-transparent flex-grow bg-gray-700 " />
+        <button type="submit" name="message" className="px-5 bg-purple-500 font-bold text-white" disabled={message.length < 1}>Senden</button>
+      </form>
     </div>
 }
 
