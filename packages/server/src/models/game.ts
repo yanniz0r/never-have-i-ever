@@ -9,6 +9,7 @@ export default class Game {
   public remainingQuestions: Question[] = [...questions];
   public currentQuestion!: Question;
   public phase = API.Phase.Answer;
+  public timeoutId?: NodeJS.Timeout;
 
   private answers: Map<Player, boolean> = new Map();
 
@@ -34,6 +35,10 @@ export default class Game {
 
   public everyoneAnswered() {
     return this.players.length === this.answers.size;
+  }
+
+  public clearTimeout() {
+    if (this.timeoutId) clearTimeout(this.timeoutId)
   }
 
   public pickQuestion() {

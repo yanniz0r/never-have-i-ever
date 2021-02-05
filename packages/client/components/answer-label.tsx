@@ -4,11 +4,8 @@ interface AnswerLabelProps {
   answer?: boolean;
 }
 
-const AnswerLabel: FC<AnswerLabelProps> = ({ answer, children }) => {
-  if (answer === undefined) {
-    return <>{children}</>;
-  }
-  return <>{ answer ? '😇' : '😈'}</>
+const AnswerLabel: FC<AnswerLabelProps> = ({ answer }) => {
+  return <>{ answer ? '😇' : answer === undefined ? '🐰' :'😈'}</>
 }
 
 export default AnswerLabel;

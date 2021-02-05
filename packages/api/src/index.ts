@@ -9,7 +9,8 @@ export enum Events {
   SendChatMessage = 'send-chat-message',
   ReceiveChatMessage = 'receive-chat-message',
   PhaseChange = 'phase-change',
-  Continue = 'continue'
+  Continue = 'continue',
+  StartCountdown = 'start-countdown'
 }
 
 export enum Phase {
@@ -21,8 +22,13 @@ export interface IQuestion {
   text: string;
 }
 
+export interface StartCountdownEvent {
+  endDate: string;
+}
+
 export interface PhaseChangeEvent {
   phase: Phase;
+  answers: Record<string, boolean>;
 }
 
 export interface ReceiveChatMessageEvent {
@@ -36,7 +42,6 @@ export interface SendChatMessageEvent {
 
 export interface PlayerAnsweredEvent {
   player: IPlayer;
-  playerAnswers: Record<string, boolean>;
 }
 
 export interface ShowQuestionEvent {

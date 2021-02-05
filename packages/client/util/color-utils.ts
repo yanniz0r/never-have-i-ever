@@ -14,7 +14,6 @@ export const colorForString = (str: string): Color => {
 }
 
 export const twBackgroundClassForColor = (color: Color) => {
-  console.log(color)
   switch(color) {
     case Color.Blue:
       return 'bg-blue-500'

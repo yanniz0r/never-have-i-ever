@@ -8,6 +8,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import { fetchGame } from '../hooks/use-game'
 import getConfig from 'next/config'
 import PlayerAnswerList from '../components/player-answer-list';
+import Countdown from '../components/countdown';
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -25,7 +26,8 @@ const Game: NextPage<GameProps> = (props) => {
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
   const [question, setQuestion] = useState<API.IQuestion>(props.question);
   const [phase, setPhase] = useState<API.Phase>(props.phase);
-  const [hasAnswered, setHasAnswered] = useState(false)
+  const [hasAnswered, setHasAnswered] = useState(false);
+  const [countdownEnd, setCountdownEnd] = useState<Date>();
 
   const io = useMemo(() => {
     if (typeof window === 'undefined') {
@@ -41,28 +43,25 @@ const Game: NextPage<GameProps> = (props) => {
     io.on(API.Events.ShowQuestion, (event: API.ShowQuestionEvent) => {
       setQuestion(event.question);
     })
-    io.on(API.Events.PlayerAnswered, (event: API.PlayerAnsweredEvent) => {
-      setAnswers(event.playerAnswers);
+    io.on(API.Events.StartCountdown, (event: API.StartCountdownEvent) => {
+      setCountdownEnd(new Date(event.endDate));
     })
     io.on(API.Events.PhaseChange, (event: API.PhaseChangeEvent) => {
       if (event.phase === API.Phase.Answer) {
         setHasAnswered(false);
-      } else {
-        setAnswers({});
       }
+      setAnswers(event.answers);
       setPhase(event.phase);
     })
     return io
   }, []);
-
-  console.log({ players })
 
   useEffect(() => {
     if (!io) return;
     const enter: API.EnterGameEvent = {
       game: String(props.gameId)
     }
-    io.emit(API.Events.Enter, enter, console.log)
+    io.emit(API.Events.Enter, enter)
   }, [io, props.gameId])
 
   const login = useCallback(() => {
@@ -148,6 +147,7 @@ const Game: NextPage<GameProps> = (props) => {
             </div>
           </div>}
           {phase === API.Phase.Answer && <div className="flex justify-center items-center flex-col bg-gradient-to-br from-blue-300 via-purple-400 to-green-300 p-10 h-full">
+            <Countdown endDate={countdownEnd} />
             <h1 className="flex flex-col text-center">
               <small className="text-3xl text-white uppercase tracking-wider text-gray-200 flex-shrink">
                 Die Frage...

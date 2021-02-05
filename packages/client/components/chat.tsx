@@ -22,7 +22,6 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
     const receiveChatMessage = (event: API.ReceiveChatMessageEvent) => {
       const player = players.find(p => p.id === event.playerId);
       if (!player) {
-        console.log(players)
         console.warn(`Player with ID ${event.playerId} is not currently connected to the game.`)
         return;
       }
