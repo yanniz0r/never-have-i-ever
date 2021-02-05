@@ -1,4 +1,3 @@
-import { v4 } from "uuid";
 import questions from "../data/questions";
 import Player from "./player";
 import Question from "./question";
@@ -13,7 +12,7 @@ export default class Game {
 
   private answers: Map<Player, boolean> = new Map();
 
-  constructor(public id: string = v4()) {
+  constructor(public id: string, public isPublic: boolean, public maxTime: number) {
     this.pickQuestion();
   }
 

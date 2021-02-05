@@ -7,6 +7,7 @@ import { FaGithub, FaHeart, FaNetworkWired } from "react-icons/fa"
 import useCreateGameMutation from "../hooks/use-create-game-mutation";
 import getConfiguration from 'next/config';
 import Head from "next/head";
+import CreateGameModal from "../components/create-game-modal";
 
 interface HomePageProps {
   question: IQuestion;
@@ -14,13 +15,8 @@ interface HomePageProps {
 
 const HomePage: NextPage<HomePageProps> = (props) => {
   const router = useRouter();
-  const createGameMutation = useCreateGameMutation()
   const [joinGameValue, setJoinGameValue] = useState("");
-
-  const createRemoteGame = useCallback(async () => {
-    const createGameResult = await createGameMutation.mutateAsync();
-    router.push(`/${createGameResult.gameId}`);
-  }, [createGameMutation]);
+  const [showCreateGameModal, setShowCreateGameModal] = useState(false);
 
   const joinGame = useCallback(() => {
     router.push(`/${joinGameValue}`);
@@ -31,6 +27,7 @@ const HomePage: NextPage<HomePageProps> = (props) => {
     <Head>
       <title>Ich habe noch nie... online!</title>
     </Head>
+    {showCreateGameModal && <CreateGameModal close={() => setShowCreateGameModal(false)} />}
     <div className="bg-gray-900" id="navigation">
       <div className="mx-auto max-w-screen-lg px-5">
         <div className="flex">
@@ -96,7 +93,7 @@ const HomePage: NextPage<HomePageProps> = (props) => {
     <div className="bg-gray-50 py-20" id="create-online-game">
       <div className="mx-auto px-5 max-w-screen-lg grid grid-cols-1 md:grid-cols-2 gap-20">
         <div className="flex items-center justify-center">
-          <button className="p-5 text-xl bg-purple-500 text-white rounded-lg font-bold flex items-center shadow-lg transform transition hover:scale-110" onClick={createRemoteGame} ><MdVideogameAsset className="mr-2 text-3xl" /> Sitzung erstellen</button>
+          <button className="p-5 text-xl bg-purple-500 text-white rounded-lg font-bold flex items-center shadow-lg transform transition hover:scale-110" onClick={() => setShowCreateGameModal(true)} ><MdVideogameAsset className="mr-2 text-3xl" /> Sitzung erstellen</button>
         </div>
         <div>
           <h2 className="text-gray-800 text-5xl">Sitzung erstellen</h2>

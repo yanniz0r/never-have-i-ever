@@ -9,6 +9,7 @@ import questions from './data/questions';
 import { debug } from './logger';
 import generateGameId from './generate-game-id';
 import dayjs from 'dayjs';
+import {json} from 'body-parser';
 
 const PORT = process.env.PORT || 4000;
 
@@ -22,18 +23,36 @@ const io = new Server(server, {
 
 const games: Record<string, Game> = {}
 
-const MAX_ROUND_TIME = 15 * 1000;
-
 app.use(cors({
   origin: '*',
-}))
+}));
 
-app.post('/game', (_request, response) => {
+app.use(json());
+
+app.get('/games', (_request, response) => {
+  const data: API.RestGetGamesData = Object.values(games).filter(game => game.isPublic).map(game => ({
+    id: game.id,
+    maxTime: game.maxTime,
+    currentQuestion: game.currentQuestion,
+    players: game.players.length,
+  }));
+  response.send(data);
+})
+
+app.post('/game', (request, response) => {
+  const maxTime: number = request.body.maxTime;
+  const isPublic: boolean = request.body.public;
+
+  if (typeof maxTime !== 'number' || typeof isPublic !== 'boolean') {
+    response.status(400).send('You sent some shit');
+    return;
+  }
+
   let id: string;
   do {
     id = generateGameId();
   } while (Object.keys(games).includes(id))
-  const game = new Game(id);
+  const game = new Game(id, isPublic, maxTime);
   games[game.id] = game;
   response.send({
     gameId: game.id,
@@ -132,7 +151,7 @@ io.on('connection', (socket: Socket) => {
       }
       io.to(game.id).emit(API.Events.PhaseChange, phaseChangeEvent);
       const startCountdownEvent: API.StartCountdownEvent = {
-        endDate: dayjs().add(MAX_ROUND_TIME, 'milliseconds').toDate().toISOString()
+        endDate: dayjs().add(game.maxTime * 1000, 'milliseconds').toDate().toISOString()
       }
       game.timeoutId = setTimeout(() => {
         game.phase = API.Phase.RevealAnswers;
@@ -142,7 +161,7 @@ io.on('connection', (socket: Socket) => {
           phase: game.phase,
         }
         io.to(game.id).emit(API.Events.PhaseChange, phaseChangeEvent);
-      }, MAX_ROUND_TIME)
+      }, game.maxTime * 1000)
       io.to(game.id).emit(API.Events.StartCountdown, startCountdownEvent)
     }
   })

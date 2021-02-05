@@ -84,3 +84,15 @@ export interface RestGetGameData {
   question: IQuestion;
   phase: Phase;
 }
+
+export type RestGetGamesData = Array<{
+  id: string;
+  maxTime: number;
+  currentQuestion: IQuestion;
+  players: number;
+}>
+
+export interface RestPostGameData {
+  maxTime: number;
+  public: boolean;
+}
