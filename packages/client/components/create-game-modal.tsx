@@ -20,12 +20,14 @@ const CreateGameModal: FC<ModalProps> = (props) => {
     validationSchema: yup.object().shape({
       time: yup
         .number()
+        .required("Bitte gib hier ein, wie lange die Spieler zum Antworten Zeit haben")
         .min(10, "Spieler müssen mindestens 10 Sekunden Zeit zum antworten haben")
         .max(60, "Spieler dürfen maximal 60 Sekunden zum antworten haben"),
       maxPlayers: yup
         .number()
+        .required("Bitte gib hier eine, wie viele Spieler deinem Spiel beitreten dürfen")
         .min(1, "Spiele ohne Spieler sind keine Spiele. Wähle einen Wert größer als 0.")
-        .max(64, "Die maximale Spielerzahl ist 64."),
+        .max(64, "Die maximale Spielerzahl ist 64"),
     }),
     initialValues: {
       isPublic: false,
