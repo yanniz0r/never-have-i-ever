@@ -6,10 +6,11 @@ import Game from './models/game'
 import Player from './models/player';
 import cors from 'cors';
 import questions from './data/questions';
-import { debug } from './logger';
-import generateGameId from './generate-game-id';
 import dayjs from 'dayjs';
 import {json} from 'body-parser';
+import games from './data/games';
+import postGame from './rest/post-game';
+import { Logger } from 'tslog';
 
 const PORT = process.env.PORT || 4000;
 
@@ -20,8 +21,6 @@ const io = new Server(server, {
     origin: '*',
   }
 });
-
-const games: Record<string, Game> = {}
 
 app.use(cors({
   origin: '*',
@@ -39,25 +38,7 @@ app.get('/games', (_request, response) => {
   response.send(data);
 })
 
-app.post('/game', (request, response) => {
-  const maxTime: number = request.body.maxTime;
-  const isPublic: boolean = request.body.public;
-
-  if (typeof maxTime !== 'number' || typeof isPublic !== 'boolean') {
-    response.status(400).send('You sent some shit');
-    return;
-  }
-
-  let id: string;
-  do {
-    id = generateGameId();
-  } while (Object.keys(games).includes(id))
-  const game = new Game(id, isPublic, maxTime);
-  games[game.id] = game;
-  response.send({
-    gameId: game.id,
-  });
-});
+app.post('/game', postGame);
 
 app.get('/question/random', (_request, response) => {
   response.send(questions[Math.floor(Math.random() * questions.length)]);
@@ -79,6 +60,8 @@ app.get('/game/:gameId', (request, response) => {
   response.send(payload)
 })
 
+const logger = new Logger();
+
 io.on('connection', (socket: Socket) => {
 
   let player: Player;
@@ -87,22 +70,28 @@ io.on('connection', (socket: Socket) => {
   socket.on(API.Events.Enter, (event: API.EnterGameEvent, ack?: API.EnterGameAck) => {
     const existingGame = games[event.game];
     if (existingGame) {
+      if (existingGame.isFull) {
+        logger.debug('Game is full', existingGame.id)
+        ack?.('full');
+        return;
+      }
       game = existingGame;
       socket.join(existingGame.id);
       const showQuestionEvent: API.ShowQuestionEvent = {
         question: game.currentQuestion
       }
+      logger.debug('Player entered the game', game.id);
       socket.to(game.id).emit(API.Events.ShowQuestion, showQuestionEvent);
-      ack?.(true);
+      ack?.('success');
     } else {
-      debug(`Game with id ${event.game} does not exist`)
-      ack?.(false);
+      logger.debug('Game does not exist', event.game);
+      ack?.('not-found');
     }
   })
 
   socket.on('disconnect', () => {
     if (player) {
-      debug(`Player ${player.id} left the game`, { game })
+      logger.debug('Player left', game.id, player.id);
       const playerWasHost = player === game.host;
       game.players = game.players.filter(p => p !== player);
       const playerLeftEvent: API.PlayerLeftEvent = {
@@ -172,7 +161,6 @@ io.on('connection', (socket: Socket) => {
       }
       game.timeoutId = setTimeout(() => {
         game.phase = API.Phase.RevealAnswers;
-        debug('Timeout over', { game })
         const phaseChangeEvent: API.PhaseChangeEvent = {
           answers: game.allAnswers(),
           phase: game.phase,
@@ -206,5 +194,5 @@ io.on('connection', (socket: Socket) => {
 
 
 server.listen(PORT, () => {
-  debug(`Server listening on port ${PORT}`)
+  logger.info(`Server listening on port ${PORT}`)
 })

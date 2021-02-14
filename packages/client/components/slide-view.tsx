@@ -1,8 +1,8 @@
-import React, { FC, useLayoutEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 
 const SlideView: FC = (props) => {
   const [isVisible, setVisible] = useState(false);
-  useLayoutEffect(() => {
+  useEffect(() => {
     setVisible(true);
   }, []);
   return <div className={`transition transform ${isVisible ? 'translate-x-0' : 'translate-full'}`}>

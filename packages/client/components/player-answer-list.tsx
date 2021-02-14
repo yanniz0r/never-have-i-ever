@@ -1,5 +1,5 @@
 import { IPlayer } from '@nhie/api';
-import React, { FC, useLayoutEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { colorForString, twBackgroundClassForColor } from '../util/color-utils';
 import AnswerLabel from './answer-label';
 
@@ -23,7 +23,7 @@ const twColsClassForPlayerAmount = (player: number) => {
 const PlayerAnswerList: FC<PlayerAnswerListProps> = ({ players, answers }) => {
   const [revealIndex, setRevealIndex] = useState(0);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (revealIndex < players.length) {
       const timeoutId = setTimeout(() => {
         setRevealIndex(revealIndex + 1);

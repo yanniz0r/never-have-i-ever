@@ -57,7 +57,7 @@ export interface EnterGameEvent {
   game: string;
 }
 
-export type EnterGameAck = (success: boolean) => void
+export type EnterGameAck = (status: 'success' | 'full' | 'not-found') => void
 
 export interface IPlayer {
   name: string;
@@ -101,4 +101,5 @@ export type RestGetGamesData = Array<{
 export interface RestPostGameData {
   maxTime: number;
   public: boolean;
+  maxPlayers: number;
 }

@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import React, { FC, useEffect, useLayoutEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 
 interface CountdownProps {
   endDate: Date;
@@ -15,7 +15,7 @@ const Countdown: FC<CountdownProps> = ({ endDate }) => {
     setSeconds(dayjs(endDate).diff(new Date(), 'seconds'))
   }, [endDate])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setNewSecond(true);
     const timeoutId = setTimeout(() => {
       setNewSecond(false);

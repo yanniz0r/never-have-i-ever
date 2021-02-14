@@ -11,6 +11,8 @@ import PlayerAnswerList from '../components/player-answer-list';
 import Countdown from '../components/countdown';
 import Modal from '../components/modal';
 import { FaShare } from 'react-icons/fa';
+import { ApiError } from 'next/dist/next-server/server/api-utils';
+import { Router, useRouter } from 'next/router';
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -23,6 +25,7 @@ interface GameProps {
 }
 
 const Game: NextPage<GameProps> = (props) => {
+  const router = useRouter();
   const [players, setPlayers] = useState<API.IPlayer[]>(props.players);
   const [host, setHost] = useState<API.IPlayer | null>(props.host);
   const [myId, setMyId] = useState<string>()
@@ -71,7 +74,15 @@ const Game: NextPage<GameProps> = (props) => {
     const enter: API.EnterGameEvent = {
       game: String(props.gameId)
     }
-    io.emit(API.Events.Enter, enter)
+    const ack: API.EnterGameAck = (status) => {
+      switch(status) {
+        case 'success':
+          break;
+        default:
+          router.push(`/?join-game-error=${status}`);
+      }
+    }
+    io.emit(API.Events.Enter, enter, ack)
   }, [io, props.gameId])
 
   const login = useCallback(() => {
@@ -223,7 +234,7 @@ export const getServerSideProps: GetServerSideProps<GameProps> = async (context)
     console.warn(`An error occurred while joining the game with id ${gameId}`, e);
     return {
       redirect: {
-        destination: '/?join-game-error=true',
+        destination: '/?join-game-error=not-existing',
         permanent: true,
       }
     }

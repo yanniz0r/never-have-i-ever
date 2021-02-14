@@ -9,6 +9,7 @@ export default class Game {
   public currentQuestion!: Question;
   public phase = API.Phase.Answer;
   public timeoutId?: NodeJS.Timeout;
+  public maxPlayers = 64;
 
   private answers: Map<Player, boolean> = new Map();
 
@@ -18,6 +19,10 @@ export default class Game {
 
   public get host(): Player | undefined {
     return this.players[0];
+  }
+
+  public get isFull(): boolean {
+    return this.players.length >= this.maxPlayers;
   }
 
   public answer(player: Player, answer: boolean) {
