@@ -161,7 +161,7 @@ const Game: NextPage<GameProps> = (props) => {
         </Modal>
       }
       <main className="page-grid h-full" style={{ filter: myId ? 'none' : 'blur(2px)' }}>
-        <div className="chat">
+        <div className="chat h-full">
           <Chat io={io} players={players} />
         </div>
         <div className="game relative">

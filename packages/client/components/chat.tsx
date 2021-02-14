@@ -1,7 +1,9 @@
 import { IPlayer } from '@nhie/api/dist'
-import React, { FC, FormEvent, useCallback, useEffect, useRef, useState } from 'react'
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import * as API from '@nhie/api/dist'
 import { colorForString, twBackgroundClassForColor } from '../util/color-utils';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 
 interface ChatProps {
   io: SocketIOClient.Socket;
@@ -14,9 +16,23 @@ interface ChatMessage {
 }
 
 const Chat: FC<ChatProps> = ({ io, players }) => {
-  const [message, setMessage] = useState<string>("");
   const messageContainerRef = useRef<HTMLDivElement>();
   const [messages, setMessages] = useState<Array<ChatMessage | string>>([]);
+  const form = useFormik<{ message: string }>({
+    initialValues: {
+      message: '',
+    },
+    validationSchema: yup.object().shape({
+      message: yup
+        .string()
+        .trim()
+        .required()
+    }),
+    onSubmit(values) {
+      sendMessage(values.message);
+      form.resetForm();
+    }
+  })
 
   useEffect(() => {
     const receiveChatMessage = (event: API.ReceiveChatMessageEvent) => {
@@ -80,33 +96,35 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
     }
   }, [players])
 
-  const sendMessage = useCallback((event: FormEvent) => {
-    event.preventDefault();
+  const sendMessage = useCallback((message: string) => {
     const sendChatMessageEvent: API.SendChatMessageEvent = {
       message,
     }
     io.emit(API.Events.SendChatMessage, sendChatMessageEvent)
-    setMessage("")
-  }, [io, message, setMessage])
+  }, [io])
 
-  return <div className="bg-gray-800 w-full h-full p-10 flex flex-col">
-      <div className="overflow-y-scroll flex-grow" ref={messageContainerRef} >
-        {messages.map((message, index) => typeof message === 'string'
-          ? <div key={index} className="text-gray-500 text-center font-italic text-xs">{message}</div>
-          : <div key={index} className="flex text-white">
-            <div className="mr-2">
-              <strong className={'rounded-sm px-1 ' + twBackgroundClassForColor(colorForString(message.player.id))}>{message.player.name}</strong>
+  return <div className="bg-gray-800 h-screen relative">
+      <div className="max-h-full relative overflow-y-auto" ref={messageContainerRef} >
+        <div className="p-10 pb-24">
+          {messages.map((message, index) => typeof message === 'string'
+            ? <div key={index} className="text-gray-500 text-center font-italic text-xs">{message}</div>
+            : <div key={index} className="flex text-white">
+              <div className="mr-2">
+                <strong className={'rounded-sm px-1 ' + twBackgroundClassForColor(colorForString(message.player.id))}>{message.player.name}</strong>
+              </div>
+              <div className="text-white">
+                {message.text}
+              </div>
             </div>
-            <div className="text-white">
-              {message.text}
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-      <form className="flex shadow-lg overflow-hidden rounded-lg mt-2" onSubmit={sendMessage}>
-        <input value={message} onChange={event => setMessage(event.target.value)} placeholder="Nachricht eingeben..." className="p-2 px-4 text-white bg-transparent flex-grow bg-gray-700 " />
-        <button type="submit" name="message" className="px-5 bg-purple-500 font-bold text-white" disabled={message.length < 1}>Senden</button>
-      </form>
+      <div className="absolute left-0 bottom-0 p-10 w-full">
+        <form className="flex shadow-lg w-full overflow-hidden rounded-lg mt-2" onSubmit={form.handleSubmit}>
+          <input name="message" value={form.values.message} onChange={form.handleChange} placeholder="Nachricht eingeben..." className="p-2 px-4 text-white bg-transparent flex-grow bg-gray-700 " />
+          <button type="submit" name="message" className="px-5 bg-purple-500 font-bold text-white" disabled={!form.isValid}>Senden</button>
+        </form>
+      </div>
     </div>
 }
 
