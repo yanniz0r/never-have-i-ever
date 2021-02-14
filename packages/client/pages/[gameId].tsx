@@ -11,8 +11,8 @@ import PlayerAnswerList from '../components/player-answer-list';
 import Countdown from '../components/countdown';
 import Modal from '../components/modal';
 import { FaShare } from 'react-icons/fa';
-import { ApiError } from 'next/dist/next-server/server/api-utils';
-import { Router, useRouter } from 'next/router';
+import { useRouter } from 'next/router';
+import UsernameModal from '../components/username-modal';
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -29,7 +29,6 @@ const Game: NextPage<GameProps> = (props) => {
   const [players, setPlayers] = useState<API.IPlayer[]>(props.players);
   const [host, setHost] = useState<API.IPlayer | null>(props.host);
   const [myId, setMyId] = useState<string>()
-  const [username, setUsername] = useState<string>("");
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
   const [question, setQuestion] = useState<API.IQuestion>(props.question);
   const [phase, setPhase] = useState<API.Phase>(props.phase);
@@ -85,12 +84,12 @@ const Game: NextPage<GameProps> = (props) => {
     io.emit(API.Events.Enter, enter, ack)
   }, [io, props.gameId])
 
-  const login = useCallback(() => {
+  const login = useCallback((username) => {
     const joinEvent: API.JoinEvent = {
       name: username
     }
     io.emit(API.Events.Join, joinEvent, setMyId);
-  }, [username])
+  }, [io])
 
   const yay = useCallback(() => {
     setHasAnswered(true);
@@ -139,14 +138,7 @@ const Game: NextPage<GameProps> = (props) => {
     </Head>
     <div className="w-screen h-screen relative">
       {!myId &&
-        <Modal>
-          <h2 className="text-xl font-bold">Dem Spiel beitreten</h2>
-          <p className="text-md mt-3 text-gray-500">Sag uns wie du heißt und du bist gleich mit dabei!</p>
-          <div className="flex mt-5">
-            <input type="text" value={username} className="flex-grow border-t border-b border-l border-gray-200 rounded-l-xl p-2" onChange={(event) => setUsername(event.currentTarget.value)} />
-            <button onClick={login} className="bg-purple-500 text-white p-2 px-4 rounded-r-xl">Beitreten</button>
-          </div>
-        </Modal>
+        <UsernameModal onSubmit={login} />
       }
       {shareModalOpen &&
         <Modal close={() => setShareModalOpen(false)}>
