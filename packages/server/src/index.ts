@@ -11,6 +11,8 @@ import {json} from 'body-parser';
 import games from './data/games';
 import postGame from './rest/post-game';
 import { Logger } from 'tslog';
+import PlayerSession from './models/session';
+import kickPlayerEvent from './socket/kick-player-event';
 
 const PORT = process.env.PORT || 4000;
 
@@ -64,8 +66,10 @@ const logger = new Logger();
 
 io.on('connection', (socket: Socket) => {
 
-  let player: Player;
-  let game: Game;
+  const session = new PlayerSession(io);
+
+  // let player: Player;
+  // let game: Game;
 
   socket.on(API.Events.Enter, (event: API.EnterGameEvent, ack?: API.EnterGameAck) => {
     const existingGame = games[event.game];
@@ -75,13 +79,13 @@ io.on('connection', (socket: Socket) => {
         ack?.('full');
         return;
       }
-      game = existingGame;
+      session.game = existingGame;
       socket.join(existingGame.id);
       const showQuestionEvent: API.ShowQuestionEvent = {
-        question: game.currentQuestion
+        question: session.game.currentQuestion
       }
-      logger.debug('Player entered the game', game.id);
-      socket.to(game.id).emit(API.Events.ShowQuestion, showQuestionEvent);
+      logger.debug('Player entered the game', session.game.id);
+      socket.to(session.game.id).emit(API.Events.ShowQuestion, showQuestionEvent);
       ack?.('success');
     } else {
       logger.debug('Game does not exist', event.game);
@@ -90,102 +94,126 @@ io.on('connection', (socket: Socket) => {
   })
 
   socket.on('disconnect', () => {
-    if (player) {
-      logger.debug('Player left', game.id, player.id);
-      const playerWasHost = player === game.host;
-      game.players = game.players.filter(p => p !== player);
+    if (session.player && session.game) {
+      logger.debug('Player left', session.game.id, session.player.id);
+      const playerWasHost = session.player === session.game.host;
+      session.game.players = session.game.players.filter(p => p !== session.player);
       const playerLeftEvent: API.PlayerLeftEvent = {
-        leftPlayer: player,
-        players: game.players,
+        leftPlayer: session.player,
+        players: session.game.players,
       }
-      io.to(game.id).emit(API.Events.PlayerLeft, playerLeftEvent)
-      if (playerWasHost && game.host) {
+      io.to(session.game.id).emit(API.Events.PlayerLeft, playerLeftEvent)
+      if (playerWasHost && session.game.host) {
         const hostChangeEvent: API.HostChangeEvent = {
-          host: game.host
+          host: session.game.host
         }
-        io.to(game.id).emit(API.Events.HostChange, hostChangeEvent);
+        io.to(session.game.id).emit(API.Events.HostChange, hostChangeEvent);
       }
-      if (game.everyoneAnswered()) {
-        game.phase = API.Phase.RevealAnswers
+      if (session.game.everyoneAnswered()) {
+        session.game.phase = API.Phase.RevealAnswers
         const phaseChangeEvent: API.PhaseChangeEvent = {
-          answers: game.allAnswers(),
-          phase: game.phase,
+          answers: session.game.allAnswers(),
+          phase: session.game.phase,
         }
         io.emit(API.Events.PhaseChange, phaseChangeEvent);
       }
     }
   })
 
+  socket.on(API.Events.KickPlayer, kickPlayerEvent(session));
+
   socket.on(API.Events.SendChatMessage, (event: API.SendChatMessageEvent) => {
+    if (!session.player) {
+      logger.error('User without session tried to send message', event);
+      return;
+    }
+    if (!session.game) {
+      logger.error('User tried to send message without being in a game', event);
+      return
+    }
     const receiveChatMessageEvent: API.ReceiveChatMessageEvent = {
       message: event.message,
-      playerId: player.id,
+      playerId: session.player.id,
     }
-    io.to(game.id).emit(API.Events.ReceiveChatMessage, receiveChatMessageEvent);
+    io.to(session.game.id).emit(API.Events.ReceiveChatMessage, receiveChatMessageEvent);
   })
 
   socket.on(API.Events.Join, (event: API.JoinEvent, ack: API.JoinAck) => {
-    player = new Player(event.name);
-    game.players.push(player);
+    if (!session.game) {
+      logger.error('User tried to join without having entered a game', event);
+      return;
+    }
+    session.player = new Player(socket, event.name);
+    session.game.players.push(session.player);
     const playerJoinedEvent: API.PlayerJoinedEvent = {
-      players: game.players,
-      joinedPlayer: player,
+      players: session.game.players,
+      joinedPlayer: session.player,
     }
-    io.to(game.id).emit(API.Events.PlayerJoined, playerJoinedEvent)
-    if (player === game.host) {
+    io.to(session.game.id).emit(API.Events.PlayerJoined, playerJoinedEvent)
+    if (session.player === session.game.host) {
       const hostChangeEvent: API.HostChangeEvent = {
-        host: game.host,
+        host: session.game.host,
       };
-      io.to(game.id).emit(API.Events.HostChange, hostChangeEvent);
+      io.to(session.game.id).emit(API.Events.HostChange, hostChangeEvent);
     }
-    ack(player.id)
+    ack(session.player.id)
   })
 
   socket.on(API.Events.Continue, () => {
-    if (player !== game.host) {
+    if (!session.player || !session.game) {
+      logger.error('Either player or game are not defined');
       return;
     }
-    if (game.phase === API.Phase.RevealAnswers) {
-      game.phase = API.Phase.Answer;
-      game.resetAnswers();
-      io.to(game.id).emit(API.Events.ShowQuestion, {
-        question: game.pickQuestion(),
+    if (session.player !== session.game.host) {
+      logger.error('Only the host can continue the game');
+      return;
+    }
+    if (session.game.phase === API.Phase.RevealAnswers) {
+      session.game.phase = API.Phase.Answer;
+      session.game.resetAnswers();
+      io.to(session.game.id).emit(API.Events.ShowQuestion, {
+        question: session.game.pickQuestion(),
       } as API.ShowQuestionEvent)
       const phaseChangeEvent: API.PhaseChangeEvent = {
-        phase: game.phase,
-        answers: game.allAnswers(),
+        phase: session.game.phase,
+        answers: session.game.allAnswers(),
       }
-      io.to(game.id).emit(API.Events.PhaseChange, phaseChangeEvent);
+      io.to(session.game.id).emit(API.Events.PhaseChange, phaseChangeEvent);
       const startCountdownEvent: API.StartCountdownEvent = {
-        endDate: dayjs().add(game.maxTime * 1000, 'milliseconds').toDate().toISOString()
+        endDate: dayjs().add(session.game.maxTime * 1000, 'milliseconds').toDate().toISOString()
       }
-      game.timeoutId = setTimeout(() => {
-        game.phase = API.Phase.RevealAnswers;
-        const phaseChangeEvent: API.PhaseChangeEvent = {
-          answers: game.allAnswers(),
-          phase: game.phase,
+      session.game.timeoutId = setTimeout(() => {
+        if (!session.game) {
+          logger.error('Session lacks game')
+          return;
         }
-        io.to(game.id).emit(API.Events.PhaseChange, phaseChangeEvent);
-      }, game.maxTime * 1000)
-      io.to(game.id).emit(API.Events.StartCountdown, startCountdownEvent)
+        session.game.phase = API.Phase.RevealAnswers;
+        const phaseChangeEvent: API.PhaseChangeEvent = {
+          answers: session.game.allAnswers(),
+          phase: session.game.phase,
+        }
+        io.to(session.game.id).emit(API.Events.PhaseChange, phaseChangeEvent);
+      }, session.game.maxTime * 1000)
+      io.to(session.game.id).emit(API.Events.StartCountdown, startCountdownEvent)
     }
   })
 
   socket.on(API.Events.Answer, (event: API.AnswerEvent) => {
-    if (!player) {
+    if (!session.player || !session.game) {
+      logger.error('Players can only answer once joined and entered the game');
       return
     }
-    game.answer(player, event.answer);
+    session.game.answer(session.player, event.answer);
     const playerAnsweredEvent: API.PlayerAnsweredEvent = {
-      player,
+      player: session.player,
     }
-    io.to(game.id).emit(API.Events.PlayerAnswered, playerAnsweredEvent);
-    if (game.everyoneAnswered()) {
-      game.clearTimeout();
-      game.phase = API.Phase.RevealAnswers
+    io.to(session.game.id).emit(API.Events.PlayerAnswered, playerAnsweredEvent);
+    if (session.game.everyoneAnswered()) {
+      session.game.clearTimeout();
+      session.game.phase = API.Phase.RevealAnswers
       const phaseChangeEvent: API.PhaseChangeEvent = {
-        answers: game.allAnswers(),
-        phase: game.phase,
+        answers: session.game.allAnswers(),
+        phase: session.game.phase,
       }
       io.emit(API.Events.PhaseChange, phaseChangeEvent);
     }

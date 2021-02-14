@@ -4,6 +4,7 @@ import * as API from '@nhie/api/dist'
 import { colorForString, twBackgroundClassForColor } from '../util/color-utils';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import Modal from './modal';
 
 interface ChatProps {
   io: SocketIOClient.Socket;
@@ -19,6 +20,7 @@ interface ChatMessage {
 const Chat: FC<ChatProps> = ({ io, players, host }) => {
   const messageContainerRef = useRef<HTMLDivElement>();
   const [messages, setMessages] = useState<Array<ChatMessage | string>>([]);
+  const [contextPlayer, setContextPlayer] = useState<IPlayer>();
   const form = useFormik<{ message: string }>({
     initialValues: {
       message: '',
@@ -104,10 +106,25 @@ const Chat: FC<ChatProps> = ({ io, players, host }) => {
     io.emit(API.Events.SendChatMessage, sendChatMessageEvent)
   }, [io])
 
+  const kickPlayer = useCallback((playerId: string) => {
+    const kickPlayerEvent: API.KickPlayerEvent = {
+      playerId,
+    }
+    setContextPlayer(undefined);
+    io.emit(API.Events.KickPlayer, kickPlayerEvent);
+  }, [io])
+
   return <div className="bg-gray-800 h-screen relative max-w-full">
+      {contextPlayer &&
+        <Modal close={() => setContextPlayer(undefined)}>
+          <h2 className="text-xl font-bol">Was soll mit {contextPlayer.name} passieren?</h2>
+          <button onClick={() => kickPlayer(contextPlayer.id)} className="bg-purple-100 mt-2 rounded-lg text-purple-500 px-8 py-2 font-bold text-center w-full">Kicken</button>
+          <button className="bg-purple-100 mt-2 rounded-lg text-purple-500 px-8 py-2 font-bold text-center w-full">Zum Host machen</button>
+        </Modal>
+      }
       <div className="px-10 py-5 max-w-full flex flex-wrap">
         {players.map(player => (
-          <div className={`text-white font-bold border-gray-800 border-8 -mr-4 h-16 w-16 rounded-full flex justify-center items-center ${twBackgroundClassForColor(colorForString(player.id))}`}>
+          <div onClick={() => setContextPlayer(player)} className={`text-white font-bold border-gray-800 border-8 -mr-4 h-16 w-16 rounded-full flex justify-center items-center ${twBackgroundClassForColor(colorForString(player.id))}`}>
             {host && host.id === player.id && <span className="absolute top-4">👑</span>}
             {player.name[0].toUpperCase()}
           </div>

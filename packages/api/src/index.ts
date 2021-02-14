@@ -11,7 +11,8 @@ export enum Events {
   PhaseChange = 'phase-change',
   Continue = 'continue',
   StartCountdown = 'start-countdown',
-  HostChange = 'host-change'
+  HostChange = 'host-change',
+  KickPlayer = 'kick',
 }
 
 export enum Phase {
@@ -102,4 +103,8 @@ export interface RestPostGameData {
   maxTime: number;
   public: boolean;
   maxPlayers: number;
+}
+
+export interface KickPlayerEvent {
+  playerId: string;
 }
