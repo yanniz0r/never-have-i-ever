@@ -74,6 +74,7 @@ app.get('/game/:gameId', (request, response) => {
     question: game.currentQuestion,
     players: game.players,
     phase: game.phase,
+    host: game.host,
   }
   response.send(payload)
 })
@@ -91,7 +92,7 @@ io.on('connection', (socket: Socket) => {
       const showQuestionEvent: API.ShowQuestionEvent = {
         question: game.currentQuestion
       }
-      socket.emit(API.Events.ShowQuestion, showQuestionEvent);
+      socket.to(game.id).emit(API.Events.ShowQuestion, showQuestionEvent);
       ack?.(true);
     } else {
       debug(`Game with id ${event.game} does not exist`)
@@ -102,12 +103,19 @@ io.on('connection', (socket: Socket) => {
   socket.on('disconnect', () => {
     if (player) {
       debug(`Player ${player.id} left the game`, { game })
+      const playerWasHost = player === game.host;
       game.players = game.players.filter(p => p !== player);
       const playerLeftEvent: API.PlayerLeftEvent = {
         leftPlayer: player,
         players: game.players,
       }
       io.to(game.id).emit(API.Events.PlayerLeft, playerLeftEvent)
+      if (playerWasHost && game.host) {
+        const hostChangeEvent: API.HostChangeEvent = {
+          host: game.host
+        }
+        io.to(game.id).emit(API.Events.HostChange, hostChangeEvent);
+      }
       if (game.everyoneAnswered()) {
         game.phase = API.Phase.RevealAnswers
         const phaseChangeEvent: API.PhaseChangeEvent = {
@@ -135,10 +143,19 @@ io.on('connection', (socket: Socket) => {
       joinedPlayer: player,
     }
     io.to(game.id).emit(API.Events.PlayerJoined, playerJoinedEvent)
+    if (player === game.host) {
+      const hostChangeEvent: API.HostChangeEvent = {
+        host: game.host,
+      };
+      io.to(game.id).emit(API.Events.HostChange, hostChangeEvent);
+    }
     ack(player.id)
   })
 
   socket.on(API.Events.Continue, () => {
+    if (player !== game.host) {
+      return;
+    }
     if (game.phase === API.Phase.RevealAnswers) {
       game.phase = API.Phase.Answer;
       game.resetAnswers();

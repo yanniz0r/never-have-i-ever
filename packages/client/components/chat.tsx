@@ -63,11 +63,20 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
     }
     io.on(API.Events.PlayerAnswered, playerAnswered);
 
+    const hostChange = (event: API.HostChangeEvent) => {
+      setMessages((oldMessages) => [
+        ...oldMessages,
+        `${event.host.name} ist jetzt der Host`
+      ]);
+    }
+    io.on(API.Events.HostChange, hostChange);
+
     return () => {
       io.off(API.Events.ReceiveChatMessage, receiveChatMessage);
       io.off(API.Events.PlayerJoined, playerJoined);
       io.off(API.Events.PlayerLeft, playerLeft);
       io.off(API.Events.PlayerAnswered, playerAnswered);
+      io.off(API.Events.HostChange, hostChange);
     }
   }, [players])
 

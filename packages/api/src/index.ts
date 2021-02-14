@@ -10,7 +10,8 @@ export enum Events {
   ReceiveChatMessage = 'receive-chat-message',
   PhaseChange = 'phase-change',
   Continue = 'continue',
-  StartCountdown = 'start-countdown'
+  StartCountdown = 'start-countdown',
+  HostChange = 'host-change'
 }
 
 export enum Phase {
@@ -34,6 +35,10 @@ export interface PhaseChangeEvent {
 export interface ReceiveChatMessageEvent {
   playerId: string;
   message: string;
+}
+
+export interface HostChangeEvent {
+  host: IPlayer;
 }
 
 export interface SendChatMessageEvent {
@@ -83,6 +88,7 @@ export interface RestGetGameData {
   players: IPlayer[];
   question: IQuestion;
   phase: Phase;
+  host?: IPlayer;
 }
 
 export type RestGetGamesData = Array<{

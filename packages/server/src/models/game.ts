@@ -16,6 +16,10 @@ export default class Game {
     this.pickQuestion();
   }
 
+  public get host(): Player | undefined {
+    return this.players[0];
+  }
+
   public answer(player: Player, answer: boolean) {
     this.answers.set(player, answer);
   }

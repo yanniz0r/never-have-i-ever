@@ -17,12 +17,14 @@ const { publicRuntimeConfig } = getConfig()
 interface GameProps {
   gameId: string;
   players: API.IPlayer[];
+  host: API.IPlayer | null;
   question: API.IQuestion;
   phase: API.Phase;
 }
 
 const Game: NextPage<GameProps> = (props) => {
   const [players, setPlayers] = useState<API.IPlayer[]>(props.players);
+  const [host, setHost] = useState<API.IPlayer | null>(props.host);
   const [myId, setMyId] = useState<string>()
   const [username, setUsername] = useState<string>("");
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
@@ -32,6 +34,7 @@ const Game: NextPage<GameProps> = (props) => {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [shareModalJustCopied, setShareModalJustCopied] = useState(false);
   const [countdownEnd, setCountdownEnd] = useState<Date>();
+  const isHost = useMemo(() => host && myId === host.id, [myId, host]);
 
   const io = useMemo(() => {
     if (typeof window === 'undefined') {
@@ -56,6 +59,9 @@ const Game: NextPage<GameProps> = (props) => {
       }
       setAnswers(event.answers);
       setPhase(event.phase);
+    })
+    io.on(API.Events.HostChange, (event: API.HostChangeEvent) => {
+      setHost(event.host);
     })
     return io
   }, []);
@@ -170,9 +176,11 @@ const Game: NextPage<GameProps> = (props) => {
             <div className="flex-grow flex justify-center items-center">
               <PlayerAnswerList players={players} answers={answers} />
             </div>
-            <div className="p-10">
-              <button onClick={continueGame} className="bg-purple-500 text-white font-bold p-2 px-4 rounded-lg">Nächste Frage</button>
-            </div>
+            {isHost &&
+              <div className="p-10">
+                <button onClick={continueGame} className="bg-purple-500 text-white font-bold p-2 px-4 rounded-lg">Nächste Frage</button>
+              </div>
+            }
           </div>}
           {phase === API.Phase.Answer && <div className="flex justify-center items-center flex-col bg-gradient-to-br from-blue-300 via-purple-400 to-green-300 p-10 h-full">
             <Countdown endDate={countdownEnd} />
@@ -208,6 +216,7 @@ export const getServerSideProps: GetServerSideProps<GameProps> = async (context)
         players: game.players,
         question: game.question,
         phase: game.phase,
+        host: game.host || null,
       }
     }
   } catch (e) {
