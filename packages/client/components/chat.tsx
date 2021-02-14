@@ -8,6 +8,7 @@ import * as yup from 'yup';
 interface ChatProps {
   io: SocketIOClient.Socket;
   players: IPlayer[];
+  host?: IPlayer;
 }
 
 interface ChatMessage {
@@ -15,7 +16,7 @@ interface ChatMessage {
   text: string;
 }
 
-const Chat: FC<ChatProps> = ({ io, players }) => {
+const Chat: FC<ChatProps> = ({ io, players, host }) => {
   const messageContainerRef = useRef<HTMLDivElement>();
   const [messages, setMessages] = useState<Array<ChatMessage | string>>([]);
   const form = useFormik<{ message: string }>({
@@ -103,20 +104,30 @@ const Chat: FC<ChatProps> = ({ io, players }) => {
     io.emit(API.Events.SendChatMessage, sendChatMessageEvent)
   }, [io])
 
-  return <div className="bg-gray-800 h-screen relative">
-      <div className="max-h-full relative overflow-y-auto" ref={messageContainerRef} >
-        <div className="p-10 pb-24">
-          {messages.map((message, index) => typeof message === 'string'
-            ? <div key={index} className="text-gray-500 text-center font-italic text-xs">{message}</div>
-            : <div key={index} className="flex text-white">
-              <div className="mr-2">
-                <strong className={'rounded-sm px-1 ' + twBackgroundClassForColor(colorForString(message.player.id))}>{message.player.name}</strong>
+  return <div className="bg-gray-800 h-screen relative max-w-full">
+      <div className="px-10 py-5 max-w-full flex flex-wrap">
+        {players.map(player => (
+          <div className={`text-white font-bold border-gray-800 border-8 -mr-4 h-16 w-16 rounded-full flex justify-center items-center ${twBackgroundClassForColor(colorForString(player.id))}`}>
+            {host && host.id === player.id && <span className="absolute top-4">👑</span>}
+            {player.name[0].toUpperCase()}
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-col max-h-full">
+        <div className="max-h-full relative overflow-y-auto" ref={messageContainerRef} >
+          <div className="px-10 pb-10 pb-24">
+            {messages.map((message, index) => typeof message === 'string'
+              ? <div key={index} className="text-gray-500 text-center font-italic text-xs">{message}</div>
+              : <div key={index} className="flex text-white">
+                <div className="mr-2">
+                  <strong className={'rounded-sm px-1 ' + twBackgroundClassForColor(colorForString(message.player.id))}>{message.player.name}</strong>
+                </div>
+                <div className="text-white">
+                  {message.text}
+                </div>
               </div>
-              <div className="text-white">
-                {message.text}
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
       <div className="absolute left-0 bottom-0 p-10 w-full">
