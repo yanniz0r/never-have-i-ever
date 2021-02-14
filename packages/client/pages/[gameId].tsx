@@ -163,7 +163,7 @@ const Game: NextPage<GameProps> = (props) => {
         </div>
         <div className="game relative">
           <div className="absolute bottom-12 right-12">
-            <button onClick={() => setShareModalOpen(true)} className="flex text-black text-opacity-50 hover:text-opacity-80 transition justify-center items-center flex-col">
+            <button onClick={() => setShareModalOpen(true)} className="flex text-white text-opacity-50 hover:text-opacity-80 transition justify-center items-center flex-col">
               <FaShare className="text-xl md:text-4xl"/>
               <span className="text-xs">Teilen</span>
             </button>
@@ -182,7 +182,7 @@ const Game: NextPage<GameProps> = (props) => {
               </div>
             }
           </div>}
-          {phase === API.Phase.Answer && <div className="flex justify-center items-center flex-col bg-gradient-to-br from-blue-300 via-purple-400 to-green-300 p-10 h-full">
+          {phase === API.Phase.Answer && <div className="flex justify-center items-center flex-col bg-gradient-to-r from-purple-500 to-purple-900 p-10 h-full">
             <Countdown endDate={countdownEnd} />
             <h1 className="flex flex-col text-center">
               <small className="text-3xl text-white uppercase tracking-wider text-gray-200 flex-shrink">
