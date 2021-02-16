@@ -170,7 +170,7 @@ const Game: NextPage<GameProps> = (props) => {
       }
       <main className="page-grid h-full" style={{ filter: myId ? 'none' : 'blur(2px)' }}>
         <div className="chat h-full max-w-screen-md">
-          <Chat io={io} players={players} host={host} />
+          <Chat io={io} players={players} host={host} currentPlayerId={myId} />
         </div>
         <div className="game relative">
           <div className="absolute bottom-12 right-12">
