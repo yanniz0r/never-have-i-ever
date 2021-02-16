@@ -8,6 +8,7 @@ import useCreateGameMutation from "../hooks/use-create-game-mutation";
 import getConfiguration from 'next/config';
 import Head from "next/head";
 import CreateGameModal from "../components/create-game-modal";
+import Navigation from "../components/navigation";
 
 interface HomePageProps {
   question: IQuestion;
@@ -28,24 +29,7 @@ const HomePage: NextPage<HomePageProps> = (props) => {
       <title>Ich habe noch nie... online!</title>
     </Head>
     {showCreateGameModal && <CreateGameModal close={() => setShowCreateGameModal(false)} />}
-    <div className="bg-gray-900" id="navigation">
-      <div className="mx-auto max-w-screen-lg px-5">
-        <div className="flex">
-          <div id="logo" className="py-4">
-            <h1 className="text-center font-bold md:text-lg text-white shadows-into-light transform -skew-y-6">Never Have<br />I Ever<small>.de</small></h1>
-          </div>
-          <div className="flex flex-grow justify-end text-white font-bold">
-            <a href="#play-local" className="flex items-center px-5">Lokal spielen</a>
-            <a href="#join-online-game" className="flex items-center px-5">Spiel beitreten</a>
-            <a href="#create-online-game" className="flex items-center px-5">
-              <span className="bg-purple-500 p-4 py-2 rounded-full">
-                Spiel erstellen
-              </span>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Navigation />
     <>
       {router.query['game-error'] === 'not-existing' &&
         <div className="bg-red-500 p-5 text-white flex">
@@ -80,7 +64,7 @@ const HomePage: NextPage<HomePageProps> = (props) => {
     </>
     <div className="bg-gradient-to-r from-purple-500 to-purple-900 py-36">
       <div className="mx-auto px-5 max-w-screen-lg">
-        <h1 className="text-white text-3xl md:text-8xl">{props.question.text}</h1>
+        <h1 className="text-white text-4xl md:text-7xl">{props.question.text}</h1>
         <p className="mt-5 text-lg md:text-xl">Finde heraus was für Laster deine Freunde, Kollegen oder Bekannten haben. Online, Offline oder allein.</p>
       </div>
     </div>
@@ -101,8 +85,8 @@ const HomePage: NextPage<HomePageProps> = (props) => {
           <p className="mt-5">Um dem Spiel beizutreten brauchst du einen Beitrittscode von jemandem aus deiner Sitzung. Den findest du aktuell relative praktisch in der URL. Wenn deine Freunde gerade dabei sind, können sie dir auch einfach den Link schicken. Geht schneller und ihr seid eh alle vernetzt.</p>
         </div>
         <div className="flex justify-center items-center">
-          <div className="flex">
-            <input className="flex-grow p-2 border-2 border-r-0 rounded-l-lg" value={joinGameValue} onChange={event => setJoinGameValue(event.currentTarget.value)} />
+          <div className="flex w-full">
+            <input className="min-w-0 p-2 border-2 w-auto border-r-0 rounded-l-lg" value={joinGameValue} onChange={event => setJoinGameValue(event.currentTarget.value)} />
             <button className="bg-purple-500 p-2 px-4 font-bold text-white rounded-r-lg disabled:opacity-50" onClick={joinGame}>
                Spiel beitreten
              </button>
@@ -142,15 +126,15 @@ const HomePage: NextPage<HomePageProps> = (props) => {
       <div className="py-20 relative z-1">
         <div className="mx-auto px-10 p-5 max-w-screen-lg text-white">
           <div>
-            <p className="text-4xl">"Absoluter Knaller - Macht remote feiern gleich viel geiler!"</p>
+            <p className="text-2xl md:text-4xl">"Absoluter Knaller - Macht remote feiern gleich viel geiler!"</p>
             <span className="text-gray-300 mt-4">- phuesch 2021</span>
           </div>
           <div className="mt-10 flex flex-col items-end">
-            <p className="text-4xl text-right">"ich soll was gutes zum Game sagen... joa"</p>
+            <p className="text-2xl md:text-4xl text-right">"ich soll was gutes zum Game sagen... joa"</p>
             <span className="text-gray-300 mt-4">- TheMutlu311, 2021</span>
           </div>
           <div className="mt-10">
-            <p className="text-4xl">"In der Zukunft wird neverhaveiever.de steiler gehen als Gamestop. save.."</p>
+            <p className="text-2xl md:text-4xl">"In der Zukunft wird neverhaveiever.de steiler gehen als Gamestop. save.."</p>
             <span className="text-gray-300 mt-4">- mcpebooster_ 2021</span>
           </div>
         </div>
