@@ -38,17 +38,12 @@ const Chat: FC<ChatProps> = ({ io, players, host }) => {
   })
 
   useEffect(() => {
-    const receiveChatMessage = (event: API.ReceiveChatMessageEvent) => {
-      const player = players.find(p => p.id === event.playerId);
-      if (!player) {
-        console.warn(`Player with ID ${event.playerId} is not currently connected to the game.`)
-        return;
-      }
+    const receiveChatMessage = (event: API.ReceiveChatMessageServerEvent) => {
       setMessages(oldMessages => [
         ...oldMessages,
         {
           text: event.message,
-          player,
+          player: event.player,
         },
       ]);
       messageContainerRef.current.scrollTo({
@@ -56,7 +51,7 @@ const Chat: FC<ChatProps> = ({ io, players, host }) => {
         behavior: 'smooth',
       })
     }
-    io.on(API.Events.ReceiveChatMessage, receiveChatMessage)
+    io.on(API.ServerEvents.ReceiveChatMessage, receiveChatMessage)
 
     const playerJoined = (event: API.PlayerJoinedEvent) => {
       setMessages((oldMessages) => [
@@ -90,20 +85,29 @@ const Chat: FC<ChatProps> = ({ io, players, host }) => {
     }
     io.on(API.Events.HostChange, hostChange);
 
+    const onKickPlayer = (event: API.KickPlayerServerEvent) => {
+      setMessages((oldMessage) => [
+        ...oldMessage,
+        `${event.player.name} wurde gekickt`
+      ])
+    }
+    io.on(API.ServerEvents.KickPlayer, onKickPlayer)
+
     return () => {
       io.off(API.Events.ReceiveChatMessage, receiveChatMessage);
       io.off(API.Events.PlayerJoined, playerJoined);
       io.off(API.Events.PlayerLeft, playerLeft);
       io.off(API.Events.PlayerAnswered, playerAnswered);
       io.off(API.Events.HostChange, hostChange);
+      io.off(API.ServerEvents.KickPlayer, onKickPlayer);
     }
-  }, [players])
+  }, [])
 
   const sendMessage = useCallback((message: string) => {
-    const sendChatMessageEvent: API.SendChatMessageEvent = {
+    const sendChatMessageEvent: API.SendChatMessageClientEvent = {
       message,
     }
-    io.emit(API.Events.SendChatMessage, sendChatMessageEvent)
+    io.emit(API.ClientEvents.SendChatMessage, sendChatMessageEvent)
   }, [io])
 
   const kickPlayer = useCallback((playerId: string) => {

@@ -47,7 +47,7 @@ const HomePage: NextPage<HomePageProps> = (props) => {
       </div>
     </div>
     <>
-      {router.query['join-game-error'] === 'not-existing' &&
+      {router.query['game-error'] === 'not-existing' &&
         <div className="bg-red-500 p-5 text-white flex">
           <div className="flex items-center">
             <MdError className="mr-3 inline-block text-2xl"/>
@@ -57,13 +57,23 @@ const HomePage: NextPage<HomePageProps> = (props) => {
           </div>
         </div>
       }
-      {router.query['join-game-error'] === 'full' &&
+      {router.query['game-error'] === 'full' &&
         <div className="bg-red-500 p-5 text-white flex">
           <div className="flex items-center">
             <MdError className="mr-3 inline-block text-2xl"/>
           </div>
           <div>
             <strong>Dieses Spiel is voll!</strong><span className="text-opacity-80 ml-1">Leider ist die maximale Spielerzahl bereits erreicht.</span>
+          </div>
+        </div>
+      }
+      {router.query['game-error'] === 'kicked' &&
+        <div className="bg-red-500 p-5 text-white flex">
+          <div className="flex items-center">
+            <MdError className="mr-3 inline-block text-2xl"/>
+          </div>
+          <div>
+            <strong>Du wurdest aus dem Spiel gekickt!</strong><span className="text-opacity-80 ml-1">Bitte benimm dich nächstes mal.</span>
           </div>
         </div>
       }

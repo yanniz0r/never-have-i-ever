@@ -13,6 +13,7 @@ import Modal from '../components/modal';
 import { FaShare } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import UsernameModal from '../components/username-modal';
+import useSocketHandler from '../hooks/use-socket-handler';
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -43,9 +44,6 @@ const Game: NextPage<GameProps> = (props) => {
       return;
     }
     const io = socketio(publicRuntimeConfig.backendUrl)
-    io.on(API.Events.PlayerJoined, (event: API.PlayerJoinedEvent) => {
-      setPlayers(event.players);
-    })
     io.on(API.Events.PlayerLeft, (event: API.PlayerLeftEvent) => {
       setPlayers(event.players);
     })
@@ -68,6 +66,16 @@ const Game: NextPage<GameProps> = (props) => {
     return io
   }, []);
 
+  useSocketHandler<API.PlayerJoinedEvent>(io, API.Events.PlayerJoined, (event) => {
+    setPlayers(event.players);
+  });
+
+  useSocketHandler<API.KickPlayerServerEvent>(io, API.ServerEvents.KickPlayer, (event) => {
+    if (event.player.id === myId) {
+      router.push('/?game-error=kicked');
+    }
+  });
+
   useEffect(() => {
     if (!io) return;
     const enter: API.EnterGameEvent = {
@@ -78,7 +86,7 @@ const Game: NextPage<GameProps> = (props) => {
         case 'success':
           break;
         default:
-          router.push(`/?join-game-error=${status}`);
+          router.push(`/?game-error=${status}`);
       }
     }
     io.emit(API.Events.Enter, enter, ack)
@@ -226,7 +234,7 @@ export const getServerSideProps: GetServerSideProps<GameProps> = async (context)
     console.warn(`An error occurred while joining the game with id ${gameId}`, e);
     return {
       redirect: {
-        destination: '/?join-game-error=not-existing',
+        destination: '/?game-error=not-existing',
         permanent: true,
       }
     }

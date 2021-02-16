@@ -15,6 +15,9 @@ export enum Events {
   KickPlayer = 'kick',
 }
 
+export * from './server-events';
+export * from './client-events';
+
 export enum Phase {
   Answer = 'answer',
   RevealAnswers = 'reveal-answer',
@@ -33,17 +36,8 @@ export interface PhaseChangeEvent {
   answers: Record<string, boolean>;
 }
 
-export interface ReceiveChatMessageEvent {
-  playerId: string;
-  message: string;
-}
-
 export interface HostChangeEvent {
   host: IPlayer;
-}
-
-export interface SendChatMessageEvent {
-  message: string;
 }
 
 export interface PlayerAnsweredEvent {

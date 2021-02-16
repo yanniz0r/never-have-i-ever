@@ -13,6 +13,8 @@ import postGame from './rest/post-game';
 import { Logger } from 'tslog';
 import PlayerSession from './models/session';
 import kickPlayerEvent from './socket/kick-player-event';
+import SocketController from './socket-controller';
+import sendChatMessageHandler from './socket/send-chat-message-handler';
 
 const PORT = process.env.PORT || 4000;
 
@@ -66,6 +68,7 @@ const logger = new Logger();
 
 io.on('connection', (socket: Socket) => {
 
+  const controller = new SocketController(io);
   const session = new PlayerSession(io);
 
   // let player: Player;
@@ -120,23 +123,8 @@ io.on('connection', (socket: Socket) => {
     }
   })
 
-  socket.on(API.Events.KickPlayer, kickPlayerEvent(session));
-
-  socket.on(API.Events.SendChatMessage, (event: API.SendChatMessageEvent) => {
-    if (!session.player) {
-      logger.error('User without session tried to send message', event);
-      return;
-    }
-    if (!session.game) {
-      logger.error('User tried to send message without being in a game', event);
-      return
-    }
-    const receiveChatMessageEvent: API.ReceiveChatMessageEvent = {
-      message: event.message,
-      playerId: session.player.id,
-    }
-    io.to(session.game.id).emit(API.Events.ReceiveChatMessage, receiveChatMessageEvent);
-  })
+  socket.on(API.Events.KickPlayer, kickPlayerEvent(controller, session));
+  socket.on(API.ClientEvents.SendChatMessage, sendChatMessageHandler(controller, session));
 
   socket.on(API.Events.Join, (event: API.JoinEvent, ack: API.JoinAck) => {
     if (!session.game) {
