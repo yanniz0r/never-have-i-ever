@@ -131,7 +131,7 @@ const Chat: FC<ChatProps> = ({ io, players, host, currentPlayerId }) => {
       }
       <div className="px-10 py-5 max-w-full flex flex-wrap">
         {players.map(player => (
-          <div onClick={currentUserIsHost ? () => setContextPlayer(player) : undefined} className={`text-white font-bold border-gray-800 border-8 -mr-4 h-16 w-16 rounded-full flex justify-center items-center ${twBackgroundClassForColor(colorForString(player.id))}`}>
+          <div onClick={currentUserIsHost ? () => setContextPlayer(player) : undefined} className={`text-white font-bold border-gray-800 border-8 -mr-4 h-16 w-16 rounded-full flex justify-center items-center ${currentUserIsHost ? 'cursor-pointer' : ''} ${twBackgroundClassForColor(colorForString(player.id))}`}>
             {host && host.id === player.id && <span className="absolute top-4">👑</span>}
             {player.name[0].toUpperCase()}
           </div>
