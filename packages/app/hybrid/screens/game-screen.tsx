@@ -69,8 +69,6 @@ const GameScreen: FC<GameScreenProps> = (props) => {
   }
 
   return <View>
-    <Text>{gameId} {phase}</Text>
-    <Text>{phase}</Text>
     <Spacer x="l">
     </Spacer>
     {phase === Phase.Answer && <GamePhaseAnswer io={io} question={question} />}

@@ -1,22 +1,31 @@
-import { useNavigation } from "@react-navigation/core"
-import React, { FC, useCallback } from "react"
+import { NavigationProp, useNavigation } from "@react-navigation/core"
+import React, { FC, useCallback, useState } from "react"
 import { Button, StyleSheet, TextInput, View } from "react-native"
+import RouteParameters from "../route-parameters"
 
-const HomeScreen: FC = () => {
-  const navigation = useNavigation();
+interface HomeScreenProps {
+  navigation: NavigationProp<RouteParameters, 'Home'>
+}
 
-  const onCreateGameButtonClick = useCallback(() => {
-    navigation.navigate("CreateGame")
+const HomeScreen: FC<HomeScreenProps> = ({ navigation }) => {
+  const [joinGameId, setJoinGameId] = useState('')
+
+  const onCreateGameButtonPress = useCallback(() => {
+    navigation.navigate("CreateGame", {})
   }, [navigation])
+
+  const onJoinGameButtonPress = useCallback(() => {
+    navigation.navigate("Game", { gameId: joinGameId })
+  }, [navigation, joinGameId])
 
   return <View style={styles.container}>
     <View style={styles.gameOption}>
-      <Button onPress={onCreateGameButtonClick} title="Spiel erstellen" />
+      <Button onPress={onCreateGameButtonPress} title="Spiel erstellen" />
     </View>
     <View style={styles.gameOption}>
       <View>
-        <TextInput style={styles.joinGameInput} />
-        <Button onPress={console.log} title="Beitreten" />
+        <TextInput style={styles.joinGameInput} onChange={e => setJoinGameId(e.nativeEvent.text)} />
+        <Button onPress={onJoinGameButtonPress} title="Beitreten" />
       </View>
     </View>
     <View style={styles.gameOption}>
