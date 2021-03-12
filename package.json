@@ -15,11 +15,14 @@
     "dev": "concurrently --prefix-colors \"red,green,blue\" \"yarn:dev:server\" \"yarn:dev:client\" \"yarn:dev:api\"",
     "deploy": "git push dokku main"
   },
-  "workspaces": [
-    "packages/client",
-    "packages/server",
-    "packages/api"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/client",
+      "packages/server",
+      "packages/api",
+      "packages/app"
+    ]
+  },
   "devDependencies": {
     "concurrently": "^5.3.0"
   }
