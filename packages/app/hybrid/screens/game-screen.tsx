@@ -4,7 +4,7 @@ import { Button, Modal, StyleSheet, Text, View } from "react-native";
 import RouteParameters from "../route-parameters";
 import socketio from 'socket.io-client'
 import { BACKEND_URL } from "../constants/networking";
-import { EnterGameEvent, Events, IQuestion, AnswerEvent, Phase, PhaseChangeEvent, JoinEvent, ShowQuestionEvent,  } from "@nhie/api";
+import { EnterGameEvent, Events, IQuestion, AnswerEvent, Phase, PhaseChangeEvent, JoinEvent, ShowQuestionEvent, PlayerJoinedEvent, PlayerLeftEvent, IPlayer,  } from "@nhie/api";
 import useGameQuery from '../hooks/use-game-query';
 import Spacer from "../components/spacer";
 import Input, { Label } from "../components/input";
@@ -20,6 +20,8 @@ const GameScreen: FC<GameScreenProps> = (props) => {
   const {gameId} = props.route.params;
   const gameQuery = useGameQuery(gameId);
   const [phase, setPhase] = useState<Phase>()
+  const [answers, setAnswers] = useState<Record<string, boolean>>({})
+  const [players, setPlayers] = useState<IPlayer[]>([])
   const [username, setUsername] = useState('')
   const [question, setQuestion] = useState<IQuestion>()
   const [isLoggedIn, setLoggedIn] = useState(false)
@@ -32,7 +34,12 @@ const GameScreen: FC<GameScreenProps> = (props) => {
     return socket;
   }, [gameId])
 
+  useSocketHandler<PlayerJoinedEvent>(io, Events.PlayerJoined, (event) => {
+    setPlayers(event.players);
+  })
+
   useSocketHandler<PhaseChangeEvent>(io, Events.PhaseChange, (event) => {
+    setAnswers(event.answers)
     setPhase(event.phase)
   })
 
@@ -72,7 +79,11 @@ const GameScreen: FC<GameScreenProps> = (props) => {
     <Spacer x="l">
     </Spacer>
     {phase === Phase.Answer && <GamePhaseAnswer io={io} question={question} />}
-    {phase === Phase.RevealAnswers && <GamePhaseRevealAnswers io={io} />}
+    {phase === Phase.RevealAnswers && <GamePhaseRevealAnswers
+      answers={answers}
+      players={players}
+      io={io}
+    />}
   </View>
 }
 

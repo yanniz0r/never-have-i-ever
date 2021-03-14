@@ -18,7 +18,15 @@
   "workspaces": {
     "nohoist": [
       "@nhie/app/react-native",
-      "@nhie/app/react-native/**"
+      "@nhie/app/react-native/**",
+      "@nhie/app/@react-native-community/masked-view",
+      "@nhie/app/@react-navigation/native",
+      "@nhie/app/@react-navigation/stack",
+      "@nhie/app/react-native-gesture-handler",
+      "@nhie/app/react-native-reanimated",
+      "@nhie/app/react-native-safe-area-context",
+      "@nhie/app/react-native-screens",
+      "@nhie/app/react-query"
     ],
     "packages": [
       "packages/client",

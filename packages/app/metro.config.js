@@ -1,8 +1,9 @@
 const path = require('path')
 
-const linkedLibs = [path.resolve(__dirname, '../..')]
-console.info('CONFIG', linkedLibs)
-
+const linkedLibs = [
+  path.resolve(__dirname, '../..'),
+  path.resolve(__dirname)
+]
 
 /**
  * Metro configuration for React Native

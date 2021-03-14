@@ -13,7 +13,17 @@ const queryClient = new QueryClient();
 
 const App: FC = () => {
   return <QueryClientProvider client={queryClient}>
-    <NavigationContainer>
+    <NavigationContainer theme={{
+      dark: true,
+      colors: {
+        background: '#000',
+        border: 'red',
+        card: 'rgb(139,92,246)',
+        primary: 'rgb(139,92,246)',
+        notification: 'rgb(139,92,246)',
+        text: 'white'
+      }
+    }}>
       <Stack.Navigator>
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="CreateGame" component={CreateGameScreen} />

@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   number: {
+    color: 'rgba(255,255,255,0.85)',
     fontSize: 32,
   },
   stepperText: {
