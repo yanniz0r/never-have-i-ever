@@ -16,6 +16,10 @@
     "deploy": "git push dokku main"
   },
   "workspaces": {
+    "nohoist": [
+      "@nhie/app/react-native",
+      "@nhie/app/react-native/**"
+    ],
     "packages": [
       "packages/client",
       "packages/server",
