@@ -1,6 +1,8 @@
 import { NavigationProp, useNavigation } from "@react-navigation/core"
 import React, { FC, useCallback, useState } from "react"
 import { Button, StyleSheet, TextInput, View } from "react-native"
+import Input from "../components/input"
+import Spacer from "../components/spacer"
 import RouteParameters from "../route-parameters"
 
 interface HomeScreenProps {
@@ -24,7 +26,9 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation }) => {
     </View>
     <View style={styles.gameOption}>
       <View>
-        <TextInput style={styles.joinGameInput} onChange={e => setJoinGameId(e.nativeEvent.text)} />
+        <Spacer b="l">
+          <Input placeholder="Beitrittscode" onChange={e => setJoinGameId(e.nativeEvent.text)} />
+        </Spacer>
         <Button onPress={onJoinGameButtonPress} title="Beitreten" />
       </View>
     </View>
@@ -40,9 +44,6 @@ const styles = StyleSheet.create({
     padding: 16,
     display: 'flex',
     flex: 1,
-  },
-  joinGameInput: {
-    backgroundColor: '#c6c6c6'
   },
   gameOption: {
     flexGrow: 1,

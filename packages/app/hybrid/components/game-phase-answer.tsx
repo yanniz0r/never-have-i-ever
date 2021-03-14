@@ -1,6 +1,7 @@
 import { AnswerEvent, Events, IQuestion } from "@nhie/api";
 import React, { FC, useCallback, useState } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import Button from "./button";
 import Spacer from "./spacer";
 import Typography from "./typography";
 

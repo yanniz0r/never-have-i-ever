@@ -3,7 +3,7 @@ import { StyleSheet, Text, TextInput, TextInputProps, View } from "react-native"
 
 interface InputProps extends TextInputProps {}
 
-const Input: FC<TextInputProps> = ({style ,...props}) => {
+const Input: FC<InputProps> = ({style ,...props}) => {
   return <TextInput style={[style, styles.input]} {...props} />
 }
 
@@ -22,6 +22,8 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 3,
     borderRadius: 8,
+    paddingHorizontal: 16,
+    color: 'white',
     borderColor: 'rgb(139,92,246)'
   }
 })
